@@ -3628,7 +3628,8 @@ $('#navRefer').addEventListener('click', ()=>{ view = {screen:'refer'}; render()
 
 // ---------- RENDER ----------
 function overallPct(){
-  return Math.round((completed.size / TOTAL_LESSONS) * 100);
+  const fullTotal = TOTAL_LESSONS + CRASH_COURSE.lessons.length + MINI_MODULES.reduce((s,m)=>s+m.lessons.length,0);
+  return Math.min(100, Math.round((completed.size / fullTotal) * 100));
 }
 // Explicit pedagogical order: foundations -> accounting depth -> statement analysis ->
 // valuation & its M&A/capital-markets cluster -> breadth tracks -> practical skills -> career capstone
@@ -3720,7 +3721,6 @@ function renderDashboard(){
     <div class="dash-head">
       <div>
         <h1>Welcome back${currentUser && currentUser!=='guest' ? ', ' + currentUser.split('@')[0] : ''}.</h1>
-        <p>${completed.size} of ${TOTAL_LESSONS} lessons complete across all 9 core tracks.</p>
       </div>
     </div>
     ${momentumHtml}
