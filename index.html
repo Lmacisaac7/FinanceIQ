@@ -666,7 +666,6 @@
       <input id="passInput" type="password" placeholder="••••••••" autocomplete="current-password">
     </div>
     <button class="login-btn" id="loginBtn">Log in</button>
-    <button class="guest-btn" id="guestBtn">Continue as guest</button>
 
     <div class="login-alt">
       <span id="toggleText">New here?</span> <button id="toggleModeBtn">Create an account</button>
@@ -3461,11 +3460,9 @@ $('#feedbackSubmitBtn').addEventListener('click', async ()=>{
 });
 
 $('#loginBtn').addEventListener('click', async ()=>{
-  const email = $('#emailInput').value.trim() || 'guest@financeiq.app';
+  const email = $('#emailInput').value.trim();
+  if(!email){ alert('Enter an email to continue.'); return; }
   await enterApp(email);
-});
-$('#guestBtn').addEventListener('click', async ()=>{
-  await enterApp('guest');
 });
 
 async function enterApp(userKey){
