@@ -3272,7 +3272,7 @@ function checkForStripeReturn(){
   if(purchased && sessionId){
     // A real backend should verify this session_id against the Stripe API before unlocking.
     // Without one, we trust the redirect — acceptable for early testing, not for real launch volume.
-    if(purchased === 'subscription'){ subscriptionCanceled = false; saveSubscriptionStatus(); }
+    if(purchased === 'subscription'){ subscriptionActive = true; saveSubscriptionStatus(); }
     else { purchasedCerts.add(purchased); savePurchasedCerts(); }
     showToast('Payment confirmed — unlocked!');
     window.history.replaceState({}, '', window.location.pathname);
@@ -3283,7 +3283,9 @@ let currentUser = null;   // string key
 let completed = new Set();
 let quizzesPassed = new Set(); // trackIds where the module quiz has been passed at 80%+
 let purchasedCerts = new Set(); // 'associate' and/or 'fica' — certs the user has paid to unlock
-let subscriptionCanceled = false;
+let subscriptionActive = false;
+let trialStartDate = null;
+let pendingCancelUntil = null; // timestamp: if set, user canceled but retains access until this date
 let view = { screen:'dashboard', trackId:null, lessonId:null };
 let quizAnswered = {}; // lessonKey -> chosen index
 let quizSubmitted = {}; // trackId -> boolean
@@ -3347,11 +3349,26 @@ async function loadProgress(){
       JSON.parse(res3.value).forEach(k => purchasedCerts.add(k));
     }
   }catch(e){ /* no purchases yet */ }
-  subscriptionCanceled = false;
+  subscriptionActive = false;
   try{
-    const res4 = await window.storage.get('subCanceled:' + currentUser);
-    if(res4 && res4.value === 'true') subscriptionCanceled = true;
-  }catch(e){ /* subscription active by default */ }
+    const res4 = await window.storage.get('subActive:' + currentUser);
+    if(res4 && res4.value === 'true') subscriptionActive = true;
+  }catch(e){ /* not subscribed by default */ }
+  pendingCancelUntil = null;
+  try{
+    const res4b = await window.storage.get('pendingCancelUntil:' + currentUser);
+    if(res4b && res4b.value) pendingCancelUntil = parseInt(res4b.value, 10);
+  }catch(e){ /* no pending cancellation */ }
+  trialStartDate = null;
+  try{
+    const res5 = await window.storage.get('trialStart:' + currentUser);
+    if(res5 && res5.value){
+      trialStartDate = parseInt(res5.value, 10);
+    }else{
+      trialStartDate = Date.now();
+      await window.storage.set('trialStart:' + currentUser, String(trialStartDate));
+    }
+  }catch(e){ trialStartDate = Date.now(); }
 }
 async function saveProgress(){
   try{
@@ -3370,8 +3387,24 @@ async function savePurchasedCerts(){
 }
 async function saveSubscriptionStatus(){
   try{
-    await window.storage.set('subCanceled:' + currentUser, subscriptionCanceled ? 'true' : 'false');
+    await window.storage.set('subActive:' + currentUser, subscriptionActive ? 'true' : 'false');
+    await window.storage.set('pendingCancelUntil:' + currentUser, pendingCancelUntil ? String(pendingCancelUntil) : '');
   }catch(e){ console.error('Could not save subscription status', e); }
+}
+const TRIAL_DAYS = 7;
+function trialDaysRemaining(){
+  if(!trialStartDate) return TRIAL_DAYS;
+  const elapsedMs = Date.now() - trialStartDate;
+  const remaining = TRIAL_DAYS - Math.floor(elapsedMs / (24*60*60*1000));
+  return Math.max(0, remaining);
+}
+function isTrialExpired(){
+  return trialDaysRemaining() <= 0;
+}
+function hasContentAccess(){
+  if(subscriptionActive) return true;
+  if(pendingCancelUntil && Date.now() < pendingCancelUntil) return true;
+  return !isTrialExpired();
 }
 
 // ---------- LOGIN ----------
@@ -3544,9 +3577,13 @@ function nextBillingDateLabel(){
   return d.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
 }
 
+function formatGraceDate(ts){
+  return new Date(ts).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+}
+
 function renderSubManageModal(){
   const card = $('#subManageCard');
-  if(!subscriptionCanceled){
+  if(subscriptionActive){
     card.innerHTML = `
       <div class="rg-icon">💳</div>
       <h2>Manage Your Subscription</h2>
@@ -3556,30 +3593,42 @@ function renderSubManageModal(){
         <button class="rg-secondary" id="subCloseBtn">Close</button>
       </div>
     `;
-  } else {
+  } else if(pendingCancelUntil && Date.now() < pendingCancelUntil) {
     card.innerHTML = `
       <div class="rg-icon">✓</div>
       <h2>Subscription Canceled</h2>
-      <p>You won't be charged again. You'll keep full access to everything until ${nextBillingDateLabel()}.</p>
+      <p>You won't be charged again. You'll keep full access to everything until ${formatGraceDate(pendingCancelUntil)}.</p>
       <div class="rg-actions">
         <button class="rg-primary" id="subResumeBtn">Resume Subscription</button>
+        <button class="rg-secondary" id="subCloseBtn">Close</button>
+      </div>
+    `;
+  } else {
+    card.innerHTML = `
+      <div class="rg-icon">💳</div>
+      <h2>No Active Subscription</h2>
+      <p>Subscribe to the FinanceIQ Career Plan — $9.99/month — for full access to the curriculum.</p>
+      <div class="rg-actions">
+        <button class="rg-primary" id="subResumeBtn">Subscribe Now</button>
         <button class="rg-secondary" id="subCloseBtn">Close</button>
       </div>
     `;
   }
   if($('#subCancelBtn')){
     $('#subCancelBtn').addEventListener('click', ()=>{
+      const graceUntil = Date.now() + 30*24*60*60*1000;
       card.innerHTML = `
         <div class="rg-icon">⚠️</div>
         <h2>Cancel your subscription?</h2>
-        <p>You'll keep full access until ${nextBillingDateLabel()}, then your account moves to view-only for anything you haven't already earned a certificate for.</p>
+        <p>You'll keep full access until ${formatGraceDate(graceUntil)}, then your account moves to view-only for anything you haven't already earned a certificate for.</p>
         <div class="rg-actions">
           <button class="rg-primary" id="subConfirmCancelBtn" style="background:#C1483D; color:#fff;">Yes, Cancel</button>
           <button class="rg-secondary" id="subNeverMindBtn">Never Mind</button>
         </div>
       `;
       $('#subConfirmCancelBtn').addEventListener('click', async ()=>{
-        subscriptionCanceled = true;
+        subscriptionActive = false;
+        pendingCancelUntil = graceUntil;
         await saveSubscriptionStatus();
         renderSubManageModal();
         showToast('Subscription canceled.');
@@ -3589,7 +3638,8 @@ function renderSubManageModal(){
   }
   if($('#subResumeBtn')){
     $('#subResumeBtn').addEventListener('click', async ()=>{
-      subscriptionCanceled = false;
+      subscriptionActive = true;
+      pendingCancelUntil = null;
       await saveSubscriptionStatus();
       renderSubManageModal();
       showToast('Subscription resumed.');
@@ -3714,12 +3764,24 @@ function renderDashboard(){
   const recTrack = recommendedTrackId ? findTrack(recommendedTrackId) : null;
   const recHtml = recTrack ? `<div class="banner"><b>Recommended for you:</b> based on what you told us, start with <b>${recTrack.title}</b>. <button class="linklike" id="recTrackBtn" style="display:inline; padding:0; margin-left:4px;">Go there now →</button></div>` : '';
 
+  let trialHtml = '';
+  if(!subscriptionActive){
+    const daysLeft = trialDaysRemaining();
+    const urgent = daysLeft <= 2;
+    trialHtml = `<div class="momentum-banner" style="${urgent ? 'background:linear-gradient(90deg, #7A2E24, #C1483D);' : ''}">
+      <div><div class="mb-text">${daysLeft > 0 ? `${daysLeft} day${daysLeft===1?'':'s'} left in your free trial` : 'Your free trial has ended'}</div>
+      <div class="mb-sub">${daysLeft > 0 ? 'FULL ACCESS UNTIL THEN' : 'SUBSCRIBE TO KEEP LEARNING'}</div></div>
+      <button class="mb-btn" id="trialSubBtn">${daysLeft > 0 ? 'Subscribe Now' : 'Subscribe — $9.99/mo'}</button>
+    </div>`;
+  }
+
   mainArea.innerHTML = `
     <div class="dash-head">
       <div>
         <h1>Welcome back${currentUser && currentUser!=='guest' ? ', ' + currentUser.split('@')[0] : ''}.</h1>
       </div>
     </div>
+    ${trialHtml}
     ${momentumHtml}
     ${recHtml}
 
@@ -3835,6 +3897,18 @@ function renderDashboard(){
   if($('#recTrackBtn')){
     $('#recTrackBtn').addEventListener('click', ()=>{
       view = { screen:'track', trackId: recommendedTrackId };
+      render();
+    });
+  }
+  if($('#trialSubBtn')){
+    $('#trialSubBtn').addEventListener('click', async ()=>{
+      if(STRIPE_CONFIGURED && STRIPE_PAYMENT_LINKS.subscription){
+        window.location.href = STRIPE_PAYMENT_LINKS.subscription;
+        return;
+      }
+      subscriptionActive = true;
+      await saveSubscriptionStatus();
+      showToast('Subscribed! (Simulated — connect Stripe in STRIPE_PAYMENT_LINKS to charge real cards)');
       render();
     });
   }
@@ -4396,6 +4470,12 @@ function renderLesson(){
   const lesson = track.lessons[idx];
   const key = lessonKey(track.id, lesson.id);
   const isDone = completed.has(key);
+
+  if(!hasContentAccess()){
+    renderTrialExpiredPaywall(track);
+    return;
+  }
+
   const { html: bodyWithIds, tocHtml } = buildLessonTOC(lesson.body);
 
   mainArea.innerHTML = `
@@ -5725,6 +5805,37 @@ function renderCredentials(){
   `;
   if($('#viewAssocBtn')) $('#viewAssocBtn').addEventListener('click', ()=>{ view = { screen:'certificate-associate' }; render(); });
   if($('#viewFicaBtn')) $('#viewFicaBtn').addEventListener('click', ()=>{ view = { screen:'certificate' }; render(); });
+}
+
+function renderTrialExpiredPaywall(track){
+  mainArea.innerHTML = `
+    <div class="cert-earned-wrap">
+      <div class="confetti-emoji">🔒</div>
+      <h1>Your 7-day free trial has ended.</h1>
+      <p class="sub">Subscribe to keep going with "${track.title}" and the full 20-module curriculum — AI Tutor, mock interviews, downloadable models, and certification exams included.</p>
+      <div class="cert-visual" style="max-width:420px; margin:0 auto 30px;">
+        <div class="cert-visual-inner" style="padding:34px 30px;">
+          <div style="font-family:var(--serif); font-size:40px; color:#C9A227; font-weight:700; margin-bottom:10px;">$9.99<span style="font-size:16px; color:#A9B4C4;">/mo</span></div>
+          <div style="font-size:13px; color:#A9B4C4;">Cancel anytime · Certificates you've already earned stay unlocked forever</div>
+        </div>
+      </div>
+      <div class="cert-actions">
+        <button class="cert-cta ready" id="subscribeNowBtn">Subscribe — $9.99/mo</button>
+        <button class="cert-back-btn" id="trialPaywallBackBtn">Back to Dashboard</button>
+      </div>
+    </div>
+  `;
+  $('#trialPaywallBackBtn').addEventListener('click', ()=>{ view = { screen:'dashboard' }; render(); });
+  $('#subscribeNowBtn').addEventListener('click', async ()=>{
+    if(STRIPE_CONFIGURED && STRIPE_PAYMENT_LINKS.subscription){
+      window.location.href = STRIPE_PAYMENT_LINKS.subscription;
+      return;
+    }
+    subscriptionActive = true;
+    await saveSubscriptionStatus();
+    showToast('Subscribed! (Simulated — connect Stripe in STRIPE_PAYMENT_LINKS to charge real cards)');
+    render();
+  });
 }
 
 function renderCertPaywall(certKey, price, certName, moduleCount){
