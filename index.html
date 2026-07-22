@@ -3284,7 +3284,6 @@ let completed = new Set();
 let quizzesPassed = new Set(); // trackIds where the module quiz has been passed at 80%+
 let purchasedCerts = new Set(); // 'associate' and/or 'fica' — certs the user has paid to unlock
 let subscriptionActive = false;
-let trialStartDate = null;
 let pendingCancelUntil = null; // timestamp: if set, user canceled but retains access until this date
 let view = { screen:'dashboard', trackId:null, lessonId:null };
 let quizAnswered = {}; // lessonKey -> chosen index
@@ -3359,16 +3358,6 @@ async function loadProgress(){
     const res4b = await window.storage.get('pendingCancelUntil:' + currentUser);
     if(res4b && res4b.value) pendingCancelUntil = parseInt(res4b.value, 10);
   }catch(e){ /* no pending cancellation */ }
-  trialStartDate = null;
-  try{
-    const res5 = await window.storage.get('trialStart:' + currentUser);
-    if(res5 && res5.value){
-      trialStartDate = parseInt(res5.value, 10);
-    }else{
-      trialStartDate = Date.now();
-      await window.storage.set('trialStart:' + currentUser, String(trialStartDate));
-    }
-  }catch(e){ trialStartDate = Date.now(); }
 }
 async function saveProgress(){
   try{
@@ -3391,20 +3380,15 @@ async function saveSubscriptionStatus(){
     await window.storage.set('pendingCancelUntil:' + currentUser, pendingCancelUntil ? String(pendingCancelUntil) : '');
   }catch(e){ console.error('Could not save subscription status', e); }
 }
-const TRIAL_DAYS = 7;
-function trialDaysRemaining(){
-  if(!trialStartDate) return TRIAL_DAYS;
-  const elapsedMs = Date.now() - trialStartDate;
-  const remaining = TRIAL_DAYS - Math.floor(elapsedMs / (24*60*60*1000));
-  return Math.max(0, remaining);
-}
-function isTrialExpired(){
-  return trialDaysRemaining() <= 0;
-}
-function hasContentAccess(){
+const FREE_PREVIEW_LESSON_COUNT = 1; // first lesson of every track/module is free forever, no time limit
+function hasSubscriptionAccess(){
   if(subscriptionActive) return true;
   if(pendingCancelUntil && Date.now() < pendingCancelUntil) return true;
-  return !isTrialExpired();
+  return false;
+}
+function canAccessLesson(lessonIdx){
+  if(hasSubscriptionAccess()) return true;
+  return lessonIdx < FREE_PREVIEW_LESSON_COUNT;
 }
 
 // ---------- LOGIN ----------
@@ -3765,13 +3749,11 @@ function renderDashboard(){
   const recHtml = recTrack ? `<div class="banner"><b>Recommended for you:</b> based on what you told us, start with <b>${recTrack.title}</b>. <button class="linklike" id="recTrackBtn" style="display:inline; padding:0; margin-left:4px;">Go there now →</button></div>` : '';
 
   let trialHtml = '';
-  if(!subscriptionActive){
-    const daysLeft = trialDaysRemaining();
-    const urgent = daysLeft <= 2;
-    trialHtml = `<div class="momentum-banner" style="${urgent ? 'background:linear-gradient(90deg, #7A2E24, #C1483D);' : ''}">
-      <div><div class="mb-text">${daysLeft > 0 ? `${daysLeft} day${daysLeft===1?'':'s'} left in your free trial` : 'Your free trial has ended'}</div>
-      <div class="mb-sub">${daysLeft > 0 ? 'FULL ACCESS UNTIL THEN' : 'SUBSCRIBE TO KEEP LEARNING'}</div></div>
-      <button class="mb-btn" id="trialSubBtn">${daysLeft > 0 ? 'Subscribe Now' : 'Subscribe — $9.99/mo'}</button>
+  if(!hasSubscriptionAccess()){
+    trialHtml = `<div class="momentum-banner">
+      <div><div class="mb-text">Try the first lesson of every track free, anytime</div>
+      <div class="mb-sub">SUBSCRIBE FOR FULL ACCESS TO ALL 20 MODULES</div></div>
+      <button class="mb-btn" id="trialSubBtn">Subscribe — $9.99/mo</button>
     </div>`;
   }
 
@@ -4471,8 +4453,8 @@ function renderLesson(){
   const key = lessonKey(track.id, lesson.id);
   const isDone = completed.has(key);
 
-  if(!hasContentAccess()){
-    renderTrialExpiredPaywall(track);
+  if(!canAccessLesson(idx)){
+    renderPreviewLimitPaywall(track);
     return;
   }
 
@@ -5381,7 +5363,7 @@ async function renderRefer(){
       </div>
       <div class="refer-how-step">
         <span class="num">02</span>
-        <div><h4>Your friend subscribes</h4><p>They still get the normal 7-day free trial — the referral bonus applies once their paid subscription starts.</p></div>
+        <div><h4>Your friend subscribes</h4><p>They can try the first lesson of every track free, anytime — the referral bonus applies once their paid subscription starts.</p></div>
       </div>
       <div class="refer-how-step">
         <span class="num">03</span>
@@ -5807,12 +5789,12 @@ function renderCredentials(){
   if($('#viewFicaBtn')) $('#viewFicaBtn').addEventListener('click', ()=>{ view = { screen:'certificate' }; render(); });
 }
 
-function renderTrialExpiredPaywall(track){
+function renderPreviewLimitPaywall(track){
   mainArea.innerHTML = `
     <div class="cert-earned-wrap">
       <div class="confetti-emoji">🔒</div>
-      <h1>Your 7-day free trial has ended.</h1>
-      <p class="sub">Subscribe to keep going with "${track.title}" and the full 20-module curriculum — AI Tutor, mock interviews, downloadable models, and certification exams included.</p>
+      <h1>You've reached the end of the free preview.</h1>
+      <p class="sub">The first lesson of "${track.title}" is free to try, anytime. Subscribe to unlock the rest of this track and the full 20-module curriculum — AI Tutor, mock interviews, downloadable models, and certification exams included.</p>
       <div class="cert-visual" style="max-width:420px; margin:0 auto 30px;">
         <div class="cert-visual-inner" style="padding:34px 30px;">
           <div style="font-family:var(--serif); font-size:40px; color:#C9A227; font-weight:700; margin-bottom:10px;">$9.99<span style="font-size:16px; color:#A9B4C4;">/mo</span></div>
