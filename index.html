@@ -3996,7 +3996,14 @@ function renderTrack(){
       </div>
     ` : (()=>{
       let calcIdx = 0;
-      const combinedBody = track.lessons.map(l => {
+      const combinedBody = track.lessons.map((l, i) => {
+        if(!canAccessLesson(i)){
+          return `<h3>${l.title}</h3>
+            <div class="lesson-locked-notice">
+              <span class="lock-icon">🔒</span>
+              <p>Subscribe to unlock this lesson and the rest of "${track.title}." <button class="lesson-locked-link" data-inline-subscribe>Subscribe — $9.99/mo</button></p>
+            </div>`;
+        }
         let section = `<h3>${l.title}</h3>${l.body}`;
         if(l.calc){
           section += renderLessonCalcHTML(l.calc, calcIdx);
@@ -4199,6 +4206,18 @@ function renderTrack(){
       renderTrack();
     });
   }
+  document.querySelectorAll('[data-inline-subscribe]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      if(STRIPE_CONFIGURED && STRIPE_PAYMENT_LINKS.subscription){
+        window.location.href = STRIPE_PAYMENT_LINKS.subscription;
+        return;
+      }
+      subscriptionActive = true;
+      await saveSubscriptionStatus();
+      showToast('Subscribed! (Simulated — connect Stripe in STRIPE_PAYMENT_LINKS to charge real cards)');
+      renderTrack();
+    });
+  });
   if(track.id === 't5'){
     renderBotMessages();
     document.querySelectorAll('#botSuggestions .bot-chip').forEach(chip=>{
