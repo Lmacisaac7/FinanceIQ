@@ -78,6 +78,10 @@
   }
   .guest-btn:hover{border-color:var(--ink);}
   .login-note{font-family:var(--mono); font-size:11px; color:var(--ink-50); text-align:center; margin-top:22px; line-height:1.6;}
+  .auth-status{font-size:13px; text-align:center; margin:4px 0 14px; min-height:0; line-height:1.5;}
+  .auth-status.error{color:#C1483D;}
+  .auth-status.success{color:#2FA86B;}
+  .auth-status.info{color:var(--ink-70);}
 
   /* ---------- APP SHELL ---------- */
   #appView{min-height:100vh; display:flex; flex-direction:column;}
@@ -663,14 +667,15 @@
     </div>
     <div class="field">
       <label for="passInput">Password</label>
-      <input id="passInput" type="password" placeholder="••••••••" autocomplete="current-password">
+      <input id="passInput" type="password" placeholder="At least 6 characters" autocomplete="current-password">
     </div>
+    <div id="authStatus" class="auth-status"></div>
     <button class="login-btn" id="loginBtn">Log in</button>
 
     <div class="login-alt">
       <span id="toggleText">New here?</span> <button id="toggleModeBtn">Create an account</button>
     </div>
-    <div class="login-note">Prototype — any email/password works. Progress is saved to this device under whatever email you enter.</div>
+    <div class="login-note">Real accounts — your password is securely stored, never visible to us. New accounts require confirming your email before you can log in.</div>
     <div class="login-legal">
       By continuing you agree to the <button class="legal-link" id="showTermsBtn">Terms of Service</button> and <button class="legal-link" id="showPrivacyBtn">Privacy Policy</button>.
     </div>
@@ -3500,6 +3505,7 @@ $('#toggleModeBtn').addEventListener('click', ()=>{
   $('#toggleModeBtn').textContent = mode === 'login' ? 'Create an account' : 'Log in';
   $('#loginBtn').textContent = mode === 'login' ? 'Log in' : 'Create account';
   $('#loginSub').textContent = mode === 'login' ? 'Log in to pick up where you left off.' : 'Set up your account to start tracking progress.';
+  setAuthStatus('', '');
 });
 
 // ---------- LEGAL PAGES ----------
@@ -3577,11 +3583,55 @@ $('#feedbackSubmitBtn').addEventListener('click', async ()=>{
   }catch(e){ status.textContent = 'Could not send — try again.'; }
 });
 
+function setAuthStatus(msg, type){
+  const el = $('#authStatus');
+  if(!el) return;
+  el.textContent = msg;
+  el.className = 'auth-status' + (type ? ' ' + type : '');
+}
+
 $('#loginBtn').addEventListener('click', async ()=>{
   const email = $('#emailInput').value.trim();
-  if(!email){ alert('Enter an email to continue.'); return; }
-  await enterApp(email);
+  const password = $('#passInput').value;
+  if(!email){ setAuthStatus('Enter an email to continue.', 'error'); return; }
+  if(!password || password.length < 6){ setAuthStatus('Password must be at least 6 characters.', 'error'); return; }
+
+  $('#loginBtn').disabled = true;
+  setAuthStatus(mode === 'signup' ? 'Creating your account...' : 'Logging in...', 'info');
+
+  if(mode === 'signup'){
+    const { data, error } = await supa.auth.signUp({ email, password });
+    $('#loginBtn').disabled = false;
+    if(error){ setAuthStatus(error.message, 'error'); return; }
+    if(data.user && !data.session){
+      setAuthStatus('Account created! Check your email to confirm it before logging in.', 'success');
+      return;
+    }
+    if(data.session){ await enterApp(email); }
+  }else{
+    const { data, error } = await supa.auth.signInWithPassword({ email, password });
+    $('#loginBtn').disabled = false;
+    if(error){
+      if(error.message.toLowerCase().includes('email not confirmed')){
+        setAuthStatus('Please confirm your email before logging in — check your inbox.', 'error');
+      }else{
+        setAuthStatus('Incorrect email or password.', 'error');
+      }
+      return;
+    }
+    await enterApp(email);
+  }
 });
+
+// If a valid session already exists (e.g. returning visitor), skip straight past the login screen.
+(async ()=>{
+  try{
+    const { data: { session } } = await supa.auth.getSession();
+    if(session && session.user && session.user.email){
+      await enterApp(session.user.email);
+    }
+  }catch(e){ /* no existing session — show the login screen normally */ }
+})();
 
 async function enterApp(userKey){
   currentUser = userKey;
@@ -3740,10 +3790,12 @@ $('#manageSubBtn').addEventListener('click', ()=>{
   $('#subManageOverlay').classList.remove('hidden');
 });
 
-$('#logoutBtn').addEventListener('click', ()=>{
+$('#logoutBtn').addEventListener('click', async ()=>{
+  await supa.auth.signOut();
   $('#appView').classList.add('hidden');
   $('#loginView').classList.remove('hidden');
   $('#emailInput').value=''; $('#passInput').value='';
+  setAuthStatus('', '');
 });
 
 $('#navDashboard').addEventListener('click', ()=>{ view = {screen:'dashboard'}; render(); });
