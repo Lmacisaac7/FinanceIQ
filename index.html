@@ -3365,11 +3365,11 @@ function findTrack(id){
 // this should be upgraded to a real backend that verifies payment via a Stripe webhook rather
 // than trusting the redirect alone, since a redirect URL can in principle be visited without paying.
 const STRIPE_PAYMENT_LINKS = {
-  associate: 'https://buy.stripe.com/test_5kQcN76Sq9418y5bWpgnK00', // redirect_url should include ?purchased=associate
-  fica: 'https://buy.stripe.com/test_28E5kFa4Cdkh5lTaSlgnK01',           // redirect_url should include ?purchased=fica
-  subscription: 'https://buy.stripe.com/test_4gMdRb2Cafsp4hP3pTgnK02', // redirect_url should include ?purchased=subscription
+  associate: 'https://buy.stripe.com/8x24gz8hw5rz2jw1engjC02', // redirect_url should include ?purchased=associate
+  fica: 'https://buy.stripe.com/3cI4gz8hw3jr6zM2irgjC01',           // redirect_url should include ?purchased=fica
+  subscription: 'https://buy.stripe.com/eVq3cvdBQ7zH4rE5uDgjC00', // redirect_url should include ?purchased=subscription
 };
-const STRIPE_CONFIGURED = true; // flipped once real Payment Link URLs above were filled in
+const STRIPE_CONFIGURED = true; // now using LIVE Stripe Payment Links (switched from sandbox on Jul 24)
 
 function checkForStripeReturn(){
   const params = new URLSearchParams(window.location.search);
