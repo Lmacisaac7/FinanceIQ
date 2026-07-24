@@ -3374,10 +3374,11 @@ const STRIPE_CONFIGURED = true; // now using LIVE Stripe Payment Links (switched
 function checkForStripeReturn(){
   const params = new URLSearchParams(window.location.search);
   const purchased = params.get('purchased');
-  const sessionId = params.get('session_id');
-  if(purchased && sessionId){
-    // A real backend should verify this session_id against the Stripe API before unlocking.
+  if(purchased){
+    // A real backend should verify this against the Stripe API before unlocking.
     // Without one, we trust the redirect — acceptable for early testing, not for real launch volume.
+    // Note: Stripe Payment Links do not append session_id to the redirect URL by default,
+    // so we can't require it here — doing so previously caused every real purchase to silently fail to unlock.
     if(purchased === 'subscription'){ subscriptionActive = true; saveSubscriptionStatus(); }
     else { purchasedCerts.add(purchased); savePurchasedCerts(); }
     showToast('Payment confirmed — unlocked!');
