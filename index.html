@@ -3365,11 +3365,11 @@ function findTrack(id){
 // this should be upgraded to a real backend that verifies payment via a Stripe webhook rather
 // than trusting the redirect alone, since a redirect URL can in principle be visited without paying.
 const STRIPE_PAYMENT_LINKS = {
-  associate: 'https://buy.stripe.com/REPLACE_WITH_YOUR_ASSOCIATE_CERT_LINK', // redirect_url should include ?purchased=associate
-  fica: 'https://buy.stripe.com/REPLACE_WITH_YOUR_FICA_CERT_LINK',           // redirect_url should include ?purchased=fica
-  subscription: 'https://buy.stripe.com/REPLACE_WITH_YOUR_SUBSCRIPTION_LINK', // redirect_url should include ?purchased=subscription
+  associate: 'https://buy.stripe.com/test_5kQcN76Sq9418y5bWpgnK00', // redirect_url should include ?purchased=associate
+  fica: 'https://buy.stripe.com/test_28E5kFa4Cdkh5lTaSlgnK01',           // redirect_url should include ?purchased=fica
+  subscription: 'https://buy.stripe.com/test_4gMdRb2Cafsp4hP3pTgnK02', // redirect_url should include ?purchased=subscription
 };
-const STRIPE_CONFIGURED = false; // flip to true once real Payment Link URLs above are filled in
+const STRIPE_CONFIGURED = true; // flipped once real Payment Link URLs above were filled in
 
 function checkForStripeReturn(){
   const params = new URLSearchParams(window.location.search);
@@ -5946,12 +5946,12 @@ function renderCredentials(){
       <div class="cred-card-icon" style="background:${ficaEarned ? '#C9A227' : 'rgba(14,27,43,.08)'};">${ficaEarned ? (ficaPurchased ? '✓' : '$') : '🔒'}</div>
       <div class="cred-card-body">
         <h3>FinanceIQ Certified Analyst (FICA)</h3>
-        <p>${ficaEarned ? (ficaPurchased ? `Unlocked · Credential ID ${ficaCredId}` : `All ${FICA_REQUIRED.length} exams passed — unlock the certificate for $19.99`) : `Pass all ${FICA_REQUIRED.length} module exams at 80%+ — ${passedCount}/${FICA_REQUIRED.length} passed so far.`}</p>
+        <p>${ficaEarned ? (ficaPurchased ? `Unlocked · Credential ID ${ficaCredId}` : `All ${FICA_REQUIRED.length} exams passed — unlock the certificate for $14.99`) : `Pass all ${FICA_REQUIRED.length} module exams at 80%+ — ${passedCount}/${FICA_REQUIRED.length} passed so far.`}</p>
         ${!ficaEarned ? `<div class="tc-progress-track" style="max-width:280px; margin-top:10px;"><div class="tc-progress-fill" style="width:${fPct}%; background:#C9A227;"></div></div>` : ''}
       </div>
       <div class="cred-card-actions">
         ${ficaEarned ? `
-          <button class="cert-cta ready" id="viewFicaBtn">${ficaPurchased ? 'View Certificate' : 'Unlock for $19.99'}</button>
+          <button class="cert-cta ready" id="viewFicaBtn">${ficaPurchased ? 'View Certificate' : 'Unlock for $14.99'}</button>
           ${ficaPurchased ? `<a href="${ficaUrl}" target="_blank" rel="noopener" class="linkedin-btn small">Add to LinkedIn</a>` : ''}
         ` : `<span class="cred-locked-tag">${fPct}% there</span>`}
       </div>
@@ -6025,7 +6025,7 @@ function renderCertPaywall(certKey, price, certName, moduleCount){
 
 function renderCertificate(){
   if(!purchasedCerts.has('fica')){
-    renderCertPaywall('fica', '19.99', 'FICA certificate', FICA_REQUIRED.length);
+    renderCertPaywall('fica', '14.99', 'FICA certificate', FICA_REQUIRED.length);
     return;
   }
   const recipientName = (currentUser && currentUser !== 'guest') ? currentUser.split('@')[0] : 'FinanceIQ Student';
