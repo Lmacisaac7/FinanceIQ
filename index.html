@@ -3918,6 +3918,14 @@ const MODULE_ORDER = [
 ];
 const FICA_REQUIRED = MODULE_ORDER; // all 20 modules
 const ASSOCIATE_REQUIRED_COUNT = 10; // any 10 of the 20 modules, passed at 80%+
+function getModuleTitle(id){
+  if(CRASH_COURSE.id === id) return CRASH_COURSE.title;
+  const t = TRACKS.find(m => m.id === id);
+  if(t) return t.title;
+  const mm = MINI_MODULES.find(m => m.id === id);
+  if(mm) return mm.title;
+  return id;
+}
 function ficaPct(){
   const passedCount = FICA_REQUIRED.filter(id => quizzesPassed.has(id)).length;
   return Math.round((passedCount / FICA_REQUIRED.length) * 100);
@@ -6144,6 +6152,12 @@ function renderCertificate(){
           <div style="font-family:var(--mono); font-size:10.5px; letter-spacing:2px; color:#C9A227; margin-bottom:10px;">FINANCEIQ CERTIFIED ANALYST</div>
           <div style="font-family:var(--serif); font-size:26px; color:#EDEFE9; font-weight:600; margin-bottom:6px; text-transform:capitalize;">${recipientName}</div>
           <div style="font-size:13px; color:#A9B4C4; margin-bottom:22px;">has successfully completed all ${FICA_REQUIRED.length} modules of the FinanceIQ curriculum — the foundational Time Value of Money module, 9 core tracks, and 10 extension modules — passing every module examination with a score of 80% or higher, demonstrating applied proficiency across accounting, valuation, markets, trading, wealth management, real estate, FP&amp;A, and M&amp;A.</div>
+          <div style="text-align:left; margin-bottom:22px;">
+            <div style="font-family:var(--mono); font-size:10px; letter-spacing:1.5px; color:#C9A227; margin-bottom:8px;">AREAS COVERED (${FICA_REQUIRED.length})</div>
+            <div style="display:flex; flex-wrap:wrap; gap:6px;">
+              ${FICA_REQUIRED.map(id => `<span style="font-size:11px; padding:4px 9px; border:1px solid rgba(201,162,39,.35); border-radius:20px; color:#EDEFE9; background:rgba(201,162,39,.07);">${getModuleTitle(id)}</span>`).join('')}
+            </div>
+          </div>
           <div style="display:flex; justify-content:space-between; font-family:var(--mono); font-size:10.5px; color:#A9B4C4; border-top:1px solid rgba(201,162,39,.3); padding-top:14px;">
             <span>ISSUED ${dateStr.toUpperCase()}</span>
             <span>CREDENTIAL ID: ${credentialId}</span>
@@ -6206,6 +6220,12 @@ function renderAssociateCertificate(){
           <div style="font-family:var(--mono); font-size:10.5px; letter-spacing:2px; color:#6FA0D8; margin-bottom:10px;">FINANCEIQ ASSOCIATE CERTIFICATE</div>
           <div style="font-family:var(--serif); font-size:26px; color:#EDEFE9; font-weight:600; margin-bottom:6px; text-transform:capitalize;">${recipientName}</div>
           <div style="font-size:13px; color:#A9B4C4; margin-bottom:22px;">has successfully passed ${ASSOCIATE_REQUIRED_COUNT} module examinations within the FinanceIQ curriculum with a score of 80% or higher, demonstrating applied proficiency in core areas of finance, accounting, and investing.</div>
+          <div style="text-align:left; margin-bottom:22px;">
+            <div style="font-family:var(--mono); font-size:10px; letter-spacing:1.5px; color:#6FA0D8; margin-bottom:8px;">AREAS COVERED (${passedCount})</div>
+            <div style="display:flex; flex-wrap:wrap; gap:6px;">
+              ${FICA_REQUIRED.filter(id => quizzesPassed.has(id)).map(id => `<span style="font-size:11px; padding:4px 9px; border:1px solid rgba(59,110,165,.4); border-radius:20px; color:#EDEFE9; background:rgba(59,110,165,.08);">${getModuleTitle(id)}</span>`).join('')}
+            </div>
+          </div>
           <div style="display:flex; justify-content:space-between; font-family:var(--mono); font-size:10.5px; color:#A9B4C4; border-top:1px solid rgba(59,110,165,.35); padding-top:14px;">
             <span>ISSUED ${dateStr.toUpperCase()}</span>
             <span>CREDENTIAL ID: ${credentialId}</span>
