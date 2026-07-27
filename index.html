@@ -3663,15 +3663,54 @@ $('#loginBtn').addEventListener('click', async ()=>{
   }
 });
 
+// Public credential verification route — no login required, so recruiters/employers clicking
+// a certUrl (e.g. joinfinanceiq.com/verify/FAC-XXXXXXXX) can confirm a credential without an account.
+function tryRenderPublicVerifyRoute(){
+  const m = window.location.pathname.match(/^\/verify\/([A-Za-z0-9-]+)\/?$/);
+  if(!m) return false;
+  const credentialId = decodeURIComponent(m[1]).toUpperCase();
+  $('#loginView').classList.add('hidden');
+  document.body.insertAdjacentHTML('beforeend', `
+    <div id="publicVerifyView" style="min-height:100vh; padding:60px 24px;">
+      <div style="max-width:720px; margin:0 auto;">
+        <div class="tb-logo" style="margin-bottom:28px;">FinanceIQ <span>$IQ</span></div>
+        <div class="dash-head">
+          <div>
+            <h1>Verify a Credential</h1>
+            <p>Confirming credential <b>${escapeHtml(credentialId)}</b> against FinanceIQ's real record.</p>
+          </div>
+        </div>
+        <div class="verify-panel">
+          <div class="controls" style="margin-bottom:0;">
+            <input type="text" id="verifyInput" placeholder="e.g. FICA-A1B2C3D4 or FAC-A1B2C3D4" style="flex:3;" value="${escapeHtml(credentialId)}">
+            <button class="primary" id="verifySubmitBtn" style="padding:9px 20px;">Verify</button>
+          </div>
+          <div id="verifyResult"></div>
+        </div>
+        <div class="banner" style="margin-top:24px;">
+          <b>How this works:</b> every FinanceIQ certificate carries a unique credential ID, recorded the moment it's earned. This page checks that ID against the real record — name, credential type, and date issued — the same way a hiring manager or recruiter can confirm a claim on a resume is genuine, not just self-reported.
+        </div>
+        <div style="margin-top:28px;"><a href="/" style="color:var(--gold);">← Go to FinanceIQ</a></div>
+      </div>
+    </div>
+  `);
+  $('#verifySubmitBtn').addEventListener('click', doVerifyLookup);
+  $('#verifyInput').addEventListener('keydown', (e)=>{ if(e.key === 'Enter') doVerifyLookup(); });
+  doVerifyLookup();
+  return true;
+}
+
 // If a valid session already exists (e.g. returning visitor), skip straight past the login screen.
-(async ()=>{
-  try{
-    const { data: { session } } = await supa.auth.getSession();
-    if(session && session.user && session.user.email){
-      await enterApp(session.user.email);
-    }
-  }catch(e){ /* no existing session — show the login screen normally */ }
-})();
+if(!tryRenderPublicVerifyRoute()){
+  (async ()=>{
+    try{
+      const { data: { session } } = await supa.auth.getSession();
+      if(session && session.user && session.user.email){
+        await enterApp(session.user.email);
+      }
+    }catch(e){ /* no existing session — show the login screen normally */ }
+  })();
+}
 
 async function enterApp(userKey){
   currentUser = userKey;
