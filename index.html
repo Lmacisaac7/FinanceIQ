@@ -703,6 +703,7 @@
     <div class="tb-right">
       <span class="streak">▲ <span id="pctHeader">0%</span> complete</span>
       <div class="avatar" id="avatarInitial">G</div>
+      <button class="manage-sub-btn" id="editNameBtn">Edit Name</button>
       <button class="manage-sub-btn" id="manageSubBtn">Manage Subscription</button>
       <button class="logout-btn" id="logoutBtn">Log out</button>
     </div>
@@ -746,6 +747,9 @@
 <div class="referral-gate-overlay hidden" id="subManageOverlay">
   <div class="referral-gate-card" id="subManageCard"></div>
 </div>
+<div class="referral-gate-overlay hidden" id="nameEditOverlay">
+  <div class="referral-gate-card" id="nameEditCard"></div>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -766,6 +770,7 @@ const PROGRESS_COLUMNS = {
   pendingCancelUntil: 'pending_cancel_until',
   onboarded: 'onboarded',
   referralCode: 'referral_code',
+  displayName: 'display_name',
 };
 
 async function ensureProgressRow(email){
@@ -3392,6 +3397,7 @@ let quizzesPassed = new Set(); // trackIds where the module quiz has been passed
 let purchasedCerts = new Set(); // 'associate' and/or 'fica' — certs the user has paid to unlock
 let subscriptionActive = false;
 let pendingCancelUntil = null; // timestamp: if set, user canceled but retains access until this date
+let displayName = ''; // real name shown on certificates/LinkedIn instead of the email prefix
 let view = { screen:'dashboard', trackId:null, lessonId:null };
 let quizAnswered = {}; // lessonKey -> chosen index
 let quizSubmitted = {}; // trackId -> boolean
@@ -3465,6 +3471,14 @@ async function loadProgress(){
     const res4b = await db.get('pendingCancelUntil:' + currentUser);
     if(res4b && res4b.value) pendingCancelUntil = parseInt(res4b.value, 10);
   }catch(e){ /* no pending cancellation */ }
+  displayName = '';
+  try{
+    const res5 = await db.get('displayName:' + currentUser);
+    if(res5 && res5.value){
+      const parsed = (()=>{ try{ return JSON.parse(res5.value); }catch(e){ return res5.value; } })();
+      if(typeof parsed === 'string') displayName = parsed;
+    }
+  }catch(e){ /* no display name set yet */ }
 }
 async function saveProgress(){
   try{
@@ -3486,6 +3500,15 @@ async function saveSubscriptionStatus(){
     await db.set('subActive:' + currentUser, subscriptionActive ? 'true' : 'false');
     await db.set('pendingCancelUntil:' + currentUser, pendingCancelUntil ? String(pendingCancelUntil) : '');
   }catch(e){ console.error('Could not save subscription status', e); }
+}
+async function saveDisplayName(){
+  try{
+    await db.set('displayName:' + currentUser, JSON.stringify(displayName));
+  }catch(e){ console.error('Could not save display name', e); }
+}
+function getRecipientName(){
+  if(displayName && displayName.trim()) return displayName.trim();
+  return (currentUser && currentUser !== 'guest') ? currentUser.split('@')[0] : 'FinanceIQ Student';
 }
 const FREE_PREVIEW_LESSON_COUNT = 1; // first lesson of every track/module is free forever, no time limit
 function hasSubscriptionAccess(){
@@ -3791,6 +3814,33 @@ $('#manageSubBtn').addEventListener('click', ()=>{
   $('#subManageOverlay').classList.remove('hidden');
 });
 
+function renderNameEditModal(){
+  const card = $('#nameEditCard');
+  card.innerHTML = `
+    <div class="rg-icon">✏️</div>
+    <h2>Name on Certificates</h2>
+    <p>This is the name that appears on your FinanceIQ certificates and gets sent to LinkedIn — use your real full name so it looks right on a resume or profile.</p>
+    <input type="text" id="displayNameInput" placeholder="e.g. Liam MacIsaac" value="${(displayName || '').replace(/"/g,'&quot;')}" style="width:100%; box-sizing:border-box; padding:12px 14px; border-radius:8px; border:1px solid rgba(201,162,39,.4); background:#0F1C2E; color:#EDEFE9; font-size:15px; margin:14px 0;">
+    <div class="rg-actions">
+      <button class="rg-primary" id="nameSaveBtn">Save</button>
+      <button class="rg-secondary" id="nameCloseBtn">Cancel</button>
+    </div>
+  `;
+  $('#nameSaveBtn').addEventListener('click', async ()=>{
+    const val = $('#displayNameInput').value.trim();
+    displayName = val;
+    await saveDisplayName();
+    $('#nameEditOverlay').classList.add('hidden');
+    showToast(val ? 'Name updated.' : 'Name cleared — certificates will use your email prefix.');
+    render();
+  });
+  $('#nameCloseBtn').addEventListener('click', ()=>{ $('#nameEditOverlay').classList.add('hidden'); });
+}
+$('#editNameBtn').addEventListener('click', ()=>{
+  renderNameEditModal();
+  $('#nameEditOverlay').classList.remove('hidden');
+});
+
 $('#logoutBtn').addEventListener('click', async ()=>{
   await supa.auth.signOut();
   $('#appView').classList.add('hidden');
@@ -3914,7 +3964,7 @@ function renderDashboard(){
   mainArea.innerHTML = `
     <div class="dash-head">
       <div>
-        <h1>Welcome back${currentUser && currentUser!=='guest' ? ', ' + currentUser.split('@')[0] : ''}.</h1>
+        <h1>Welcome back${currentUser && currentUser!=='guest' ? ', ' + (displayName && displayName.trim() ? displayName.trim().split(' ')[0] : currentUser.split('@')[0]) : ''}.</h1>
       </div>
     </div>
     ${trialHtml}
@@ -6029,7 +6079,7 @@ function renderCertificate(){
     renderCertPaywall('fica', '14.99', 'FICA certificate', FICA_REQUIRED.length);
     return;
   }
-  const recipientName = (currentUser && currentUser !== 'guest') ? currentUser.split('@')[0] : 'FinanceIQ Student';
+  const recipientName = getRecipientName();
   const credentialId = 'FICA-' + simpleHash(currentUser || 'guest').padEnd(8,'0').slice(0,8);
   const now = new Date();
   const dateStr = now.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
@@ -6090,7 +6140,7 @@ function renderAssociateCertificate(){
     renderCertPaywall('associate', '9.99', 'Associate certificate', ASSOCIATE_REQUIRED_COUNT);
     return;
   }
-  const recipientName = (currentUser && currentUser !== 'guest') ? currentUser.split('@')[0] : 'FinanceIQ Student';
+  const recipientName = getRecipientName();
   const credentialId = 'FAC-' + simpleHash((currentUser || 'guest') + ':assoc').padEnd(8,'0').slice(0,8);
   const now = new Date();
   const dateStr = now.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
