@@ -661,6 +661,11 @@
     <div class="login-logo">FinanceIQ <span>$IQ</span></div>
     <div class="login-sub" id="loginSub">Log in to pick up where you left off.</div>
 
+    <div class="field" id="nameField" style="display:none;">
+      <label for="nameInput">Full Name</label>
+      <input id="nameInput" type="text" placeholder="Your full name" autocomplete="name">
+      <div style="font-size:12px; color:#A9B4C4; margin-top:4px;">This is what appears on your certificates and LinkedIn — use your real name.</div>
+    </div>
     <div class="field">
       <label for="emailInput">Email</label>
       <input id="emailInput" type="email" placeholder="you@email.com" autocomplete="email">
@@ -3529,6 +3534,7 @@ $('#toggleModeBtn').addEventListener('click', ()=>{
   $('#toggleModeBtn').textContent = mode === 'login' ? 'Create an account' : 'Log in';
   $('#loginBtn').textContent = mode === 'login' ? 'Log in' : 'Create account';
   $('#loginSub').textContent = mode === 'login' ? 'Log in to pick up where you left off.' : 'Set up your account to start tracking progress.';
+  $('#nameField').style.display = mode === 'signup' ? 'block' : 'none';
   setAuthStatus('', '');
 });
 
@@ -3617,8 +3623,10 @@ function setAuthStatus(msg, type){
 $('#loginBtn').addEventListener('click', async ()=>{
   const email = $('#emailInput').value.trim();
   const password = $('#passInput').value;
+  const fullName = $('#nameInput').value.trim();
   if(!email){ setAuthStatus('Enter an email to continue.', 'error'); return; }
   if(!password || password.length < 6){ setAuthStatus('Password must be at least 6 characters.', 'error'); return; }
+  if(mode === 'signup' && !fullName){ setAuthStatus('Enter your full name — this is what appears on your certificates.', 'error'); return; }
 
   $('#loginBtn').disabled = true;
   setAuthStatus(mode === 'signup' ? 'Creating your account...' : 'Logging in...', 'info');
@@ -3628,10 +3636,18 @@ $('#loginBtn').addEventListener('click', async ()=>{
     $('#loginBtn').disabled = false;
     if(error){ setAuthStatus(error.message, 'error'); return; }
     if(data.user && !data.session){
+      // Email confirmation required — no session yet, so we can't write to the DB.
+      // Stash the name locally and apply it the first time this user actually logs in.
+      try{ localStorage.setItem('pendingDisplayName:' + email.toLowerCase(), fullName); }catch(e){}
       setAuthStatus('Account created! Check your email to confirm it before logging in.', 'success');
       return;
     }
-    if(data.session){ await enterApp(email); }
+    if(data.session){
+      await enterApp(email);
+      displayName = fullName;
+      await saveDisplayName();
+      render();
+    }
   }else{
     const { data, error } = await supa.auth.signInWithPassword({ email, password });
     $('#loginBtn').disabled = false;
@@ -3661,6 +3677,16 @@ async function enterApp(userKey){
   currentUser = userKey;
   $('#avatarInitial').textContent = userKey.charAt(0).toUpperCase();
   await loadProgress();
+  if(!displayName){
+    try{
+      const pending = localStorage.getItem('pendingDisplayName:' + userKey.toLowerCase());
+      if(pending){
+        displayName = pending;
+        await saveDisplayName();
+        localStorage.removeItem('pendingDisplayName:' + userKey.toLowerCase());
+      }
+    }catch(e){}
+  }
   checkForStripeReturn();
   $('#loginView').classList.add('hidden');
   $('#appView').classList.remove('hidden');
@@ -3845,7 +3871,7 @@ $('#logoutBtn').addEventListener('click', async ()=>{
   await supa.auth.signOut();
   $('#appView').classList.add('hidden');
   $('#loginView').classList.remove('hidden');
-  $('#emailInput').value=''; $('#passInput').value='';
+  $('#emailInput').value=''; $('#passInput').value=''; $('#nameInput').value='';
   setAuthStatus('', '');
 });
 
