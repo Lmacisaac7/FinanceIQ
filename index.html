@@ -3681,11 +3681,12 @@ function tryRenderPublicVerifyRoute(){
           </div>
         </div>
         <div class="verify-panel">
-          <div class="controls" style="margin-bottom:0;">
+          <div class="controls" id="verifyControls" style="margin-bottom:0; display:none;">
             <input type="text" id="verifyInput" placeholder="e.g. FICA-A1B2C3D4 or FAC-A1B2C3D4" style="flex:3;" value="${escapeHtml(credentialId)}">
             <button class="primary" id="verifySubmitBtn" style="padding:9px 20px;">Verify</button>
           </div>
           <div id="verifyResult"></div>
+          <a href="#" id="verifyDifferentLink" style="display:block; margin-top:14px; font-size:13px; color:var(--gold);">Verify a different credential →</a>
         </div>
         <div class="banner" style="margin-top:24px;">
           <b>How this works:</b> every FinanceIQ certificate carries a unique credential ID, recorded the moment it's earned. This page checks that ID against the real record — name, credential type, and date issued — the same way a hiring manager or recruiter can confirm a claim on a resume is genuine, not just self-reported.
@@ -3696,6 +3697,12 @@ function tryRenderPublicVerifyRoute(){
   `);
   $('#verifySubmitBtn').addEventListener('click', doVerifyLookup);
   $('#verifyInput').addEventListener('keydown', (e)=>{ if(e.key === 'Enter') doVerifyLookup(); });
+  $('#verifyDifferentLink').addEventListener('click', (e)=>{
+    e.preventDefault();
+    $('#verifyControls').style.display = 'flex';
+    $('#verifyDifferentLink').style.display = 'none';
+    $('#verifyInput').focus();
+  });
   doVerifyLookup();
   return true;
 }
