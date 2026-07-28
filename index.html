@@ -3403,6 +3403,7 @@ let purchasedCerts = new Set(); // 'associate' and/or 'fica' — certs the user 
 let subscriptionActive = false;
 let pendingCancelUntil = null; // timestamp: if set, user canceled but retains access until this date
 let displayName = ''; // real name shown on certificates/LinkedIn instead of the email prefix
+let verifyLookupState = { status:'idle', result:null, queriedId:'' }; // idle | loading | found | notfound — moved up here since the public /verify/ route can run this before the app's normal init order
 let view = { screen:'dashboard', trackId:null, lessonId:null };
 let quizAnswered = {}; // lessonKey -> chosen index
 let quizSubmitted = {}; // trackId -> boolean
@@ -5711,7 +5712,7 @@ async function writeCredentialRecord(credentialId, data){
   }catch(e){ /* non-fatal — verification record is a bonus, not a blocker */ }
 }
 
-let verifyLookupState = { status:'idle', result:null, queriedId:'' }; // idle | loading | found | notfound
+// verifyLookupState is now declared earlier in the script — see top-level state vars
 
 function renderVerify(){
   mainArea.innerHTML = `
