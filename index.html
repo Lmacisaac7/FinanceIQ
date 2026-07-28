@@ -5745,18 +5745,31 @@ function renderVerifyResult(){
     return;
   }
   const r = s.result;
-  box.innerHTML = `<div class="verify-card verify-valid">
-    <div class="verify-icon">✓</div>
-    <div>
-      <div class="verify-title">Verified — this is a genuine FinanceIQ credential</div>
-      <div class="verify-grid">
-        <div><span class="vl">Name</span><span class="vv">${escapeHtml(r.name)}</span></div>
-        <div><span class="vl">Credential</span><span class="vv">${escapeHtml(r.type)}</span></div>
-        <div><span class="vl">Issued</span><span class="vv">${escapeHtml(r.dateEarned)}</span></div>
-        <div><span class="vl">Modules Passed</span><span class="vv">${r.modulesCompleted} of ${r.modulesTotal} at 80%+</span></div>
+  const isFica = /FICA/i.test(r.type);
+  box.innerHTML = `
+    <div style="display:flex; align-items:center; gap:10px; margin:18px 0 14px;">
+      <div class="verify-icon" style="background:var(--gain); color:#fff; flex-shrink:0; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700;">✓</div>
+      <div class="verify-title" style="font-family:var(--serif); font-size:16px; font-weight:700;">Verified — this is a genuine FinanceIQ credential</div>
+    </div>
+    <div class="cert-visual" style="${isFica ? '' : 'border-color:#3B6EA5;'} margin-bottom:10px;">
+      <div class="cert-visual-inner" style="${isFica ? '' : 'border-color:rgba(59,110,165,.4);'} text-align:center;">
+        <svg width="90" height="90" viewBox="0 0 90 90" style="margin:0 auto 14px;">
+          <circle cx="45" cy="45" r="42" fill="none" stroke="${isFica ? '#C9A227' : '#3B6EA5'}" stroke-width="1.5"/>
+          <circle cx="45" cy="45" r="34" fill="none" stroke="${isFica ? '#C9A227' : '#3B6EA5'}" stroke-width="1"/>
+          <circle cx="45" cy="45" r="27" fill="#0F1C2E" stroke="${isFica ? '#C9A227' : '#3B6EA5'}" stroke-width="1"/>
+          <text x="45" y="41" text-anchor="middle" font-family="Fraunces, serif" font-weight="700" font-size="${isFica ? 15 : 13}" fill="#EDEFE9">${isFica ? 'FICA' : 'FIQ-A'}</text>
+          <text x="45" y="55" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="7" letter-spacing="1.5" fill="#A9B4C4">${isFica ? 'CERTIFIED' : 'ASSOCIATE'}</text>
+        </svg>
+        <div style="font-family:var(--mono); font-size:10.5px; letter-spacing:2px; color:${isFica ? '#C9A227' : '#6FA0D8'}; margin-bottom:10px;">${escapeHtml(r.type.toUpperCase())}</div>
+        <div style="font-family:var(--serif); font-size:26px; color:#EDEFE9; font-weight:600; margin-bottom:6px; text-transform:capitalize;">${escapeHtml(r.name)}</div>
+        <div style="font-size:13px; color:#A9B4C4; margin-bottom:22px;">has successfully passed ${r.modulesCompleted} of ${r.modulesTotal} FinanceIQ module examinations at a score of 80% or higher.</div>
+        <div style="display:flex; justify-content:space-between; font-family:var(--mono); font-size:10.5px; color:#A9B4C4; border-top:1px solid rgba(201,162,39,.3); padding-top:14px;">
+          <span>ISSUED ${escapeHtml((r.dateEarned || '').toUpperCase())}</span>
+          <span>CREDENTIAL ID: ${escapeHtml(s.queriedId)}</span>
+        </div>
       </div>
     </div>
-  </div>`;
+  `;
 }
 
 async function doVerifyLookup(){
