@@ -276,6 +276,13 @@
   .compare-col:nth-child(2) li::before{color:#3B6EA5;}
   @media(max-width:640px){.compare-table{grid-template-columns:1fr;} .compare-col:first-child{border-right:none; border-bottom:1px solid rgba(14,27,43,.1);}}
 
+  .model-table{width:100%; border-collapse:collapse; margin:20px 0 28px; font-family:var(--mono); font-size:13px; border:1px solid rgba(14,27,43,.15); border-radius:6px; overflow:hidden;}
+  .model-table th{background:#0F1C2E; color:#EDEFE9; padding:9px 12px; text-align:right; font-weight:600; font-size:11.5px;}
+  .model-table th:first-child{text-align:left;}
+  .model-table td{padding:8px 12px; text-align:right; border-top:1px solid rgba(14,27,43,.08); color:var(--ink-70);}
+  .model-table td:first-child{text-align:left; color:var(--ink);}
+  .model-table tr:nth-child(even){background:rgba(14,27,43,.02);}
+
   .verify-panel{background:var(--surface,#fff); border:1px solid rgba(14,27,43,.12); border-radius:12px; padding:24px; margin-top:20px;}
   .login-legal{font-size:11.5px; color:var(--ink-50); text-align:center; margin-top:16px; line-height:1.6;}
   .legal-link{background:none; border:none; color:var(--gold); text-decoration:underline; font-size:11.5px; padding:0; cursor:pointer; display:inline;}
@@ -699,8 +706,7 @@
         <button id="navTutor">AI Tutor</button>
         <button id="navInterview">Interview &amp; Networking Prep</button>
         <button id="navCert">Certification</button>
-        <button id="navCommunity">Community</button>
-        <button id="navVerify">Verify a Credential</button>
+        <button id="navModeling">Financial Modeling</button>
         <button id="navRefer">Refer &amp; Earn</button>
       </div>
       <button class="tb-hamburger" id="tbHamburger" aria-label="Open menu">☰</button>
@@ -708,7 +714,6 @@
     <div class="tb-right">
       <span class="streak">▲ <span id="pctHeader">0%</span> complete</span>
       <div class="avatar" id="avatarInitial">G</div>
-      <button class="manage-sub-btn" id="editNameBtn">Edit Name</button>
       <button class="manage-sub-btn" id="manageSubBtn">Manage Subscription</button>
       <button class="logout-btn" id="logoutBtn">Log out</button>
     </div>
@@ -4203,10 +4208,6 @@ function renderNameEditModal(){
   });
   $('#nameCloseBtn').addEventListener('click', ()=>{ $('#nameEditOverlay').classList.add('hidden'); });
 }
-$('#editNameBtn').addEventListener('click', ()=>{
-  renderNameEditModal();
-  $('#nameEditOverlay').classList.remove('hidden');
-});
 
 $('#logoutBtn').addEventListener('click', async ()=>{
   await supa.auth.signOut();
@@ -4221,8 +4222,7 @@ $('#tbHamburger').addEventListener('click', ()=>{ $('.tb-nav').classList.toggle(
 document.querySelectorAll('.tb-nav button').forEach(btn=>{
   btn.addEventListener('click', ()=>{ $('.tb-nav').classList.remove('mobile-open'); });
 });
-$('#navCommunity').addEventListener('click', ()=>{ view = {screen:'community'}; render(); });
-$('#navVerify').addEventListener('click', ()=>{ view = {screen:'verify'}; render(); });
+$('#navModeling').addEventListener('click', ()=>{ view = {screen:'modeling'}; render(); });
 $('#navTutor').addEventListener('click', ()=>{ view = {screen:'tutor'}; render(); });
 $('#navInterview').addEventListener('click', ()=>{ view = {screen:'interview'}; render(); });
 $('#navCert').addEventListener('click', ()=>{ view = {screen:'credentials'}; render(); });
@@ -4289,8 +4289,7 @@ function render(){
   else if(view.screen === 'certificate'){ renderCertificate(); }
   else if(view.screen === 'certificate-associate'){ renderAssociateCertificate(); }
   else if(view.screen === 'credentials'){ $('#navCert').classList.add('active'); renderCredentials(); }
-  else if(view.screen === 'community'){ $('#navCommunity').classList.add('active'); renderCommunity(); }
-  else if(view.screen === 'verify'){ $('#navVerify').classList.add('active'); renderVerify(); }
+  else if(view.screen === 'modeling'){ $('#navModeling').classList.add('active'); renderModeling(); }
 }
 
 function trackProgress(track){
@@ -6007,6 +6006,212 @@ async function writeCredentialRecord(credentialId, data){
 }
 
 // verifyLookupState is now declared earlier in the script — see top-level state vars
+
+let modelingTab = 'dcf'; // dcf | lbo | comps
+
+function renderModeling(){
+  const main = $('#mainArea');
+  main.innerHTML = `
+    <div class="dash-head">
+      <div>
+        <h1>Financial Modeling</h1>
+        <p>Step-by-step, build-along walkthroughs for the three models that show up constantly in real interviews and on the job — build them with real numbers, not just read about them.</p>
+      </div>
+    </div>
+    <div class="controls" style="margin-bottom:24px; display:flex; gap:10px;">
+      <button class="model-tab-btn ${modelingTab==='dcf'?'active':''}" data-tab="dcf" style="padding:10px 18px; border-radius:8px; border:1px solid rgba(14,27,43,.15); background:${modelingTab==='dcf'?'#0F1C2E':'#fff'}; color:${modelingTab==='dcf'?'#EDEFE9':'#0E1B2B'}; cursor:pointer; font-size:14px;">DCF Model</button>
+      <button class="model-tab-btn ${modelingTab==='lbo'?'active':''}" data-tab="lbo" style="padding:10px 18px; border-radius:8px; border:1px solid rgba(14,27,43,.15); background:${modelingTab==='lbo'?'#0F1C2E':'#fff'}; color:${modelingTab==='lbo'?'#EDEFE9':'#0E1B2B'}; cursor:pointer; font-size:14px;">LBO Model</button>
+      <button class="model-tab-btn ${modelingTab==='comps'?'active':''}" data-tab="comps" style="padding:10px 18px; border-radius:8px; border:1px solid rgba(14,27,43,.15); background:${modelingTab==='comps'?'#0F1C2E':'#fff'}; color:${modelingTab==='comps'?'#EDEFE9':'#0E1B2B'}; cursor:pointer; font-size:14px;">Comps Set</button>
+    </div>
+    <div id="modelingContent"></div>
+  `;
+  document.querySelectorAll('.model-tab-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ modelingTab = btn.dataset.tab; renderModeling(); });
+  });
+  const content = $('#modelingContent');
+  if(modelingTab === 'dcf') content.innerHTML = dcfBuildHTML();
+  else if(modelingTab === 'lbo') content.innerHTML = lboBuildHTML();
+  else content.innerHTML = compsBuildHTML();
+
+  // Wire up the calculator(s) present on whichever tab is showing
+  if(modelingTab === 'dcf'){ wireLessonCalc(DCF_CALC, 900); }
+  if(modelingTab === 'lbo'){ wireLessonCalc(LBO_CALC, 901); }
+  if(modelingTab === 'comps'){ wireLessonCalc(COMPS_CALC, 902); }
+}
+
+const DCF_CALC = {
+  inputs:[
+    {key:'y5FCF', label:'Year 5 Unlevered FCF ($M)', default:145, step:5},
+    {key:'growthRate', label:'Terminal Growth Rate (%)', default:2.5, step:0.25},
+    {key:'wacc', label:'WACC / Discount Rate (%)', default:9, step:0.25},
+  ], compute:(v)=>{
+    const g = v.growthRate/100, r = v.wacc/100;
+    if(r <= g) return { label:'Terminal Value', display:'WACC must exceed growth rate' };
+    const tv = v.y5FCF * (1+g) / (r-g);
+    const pvTV = tv / Math.pow(1+r, 5);
+    return { label:'Terminal Value / PV of Terminal Value', display: '$'+tv.toFixed(0)+'M / $'+pvTV.toFixed(0)+'M' };
+  }
+};
+
+const LBO_CALC = {
+  inputs:[
+    {key:'entryEbitda', label:'Entry Year EBITDA ($M)', default:100, step:5},
+    {key:'entryMultiple', label:'Entry Multiple (x EBITDA)', default:8, step:0.5},
+    {key:'exitMultiple', label:'Exit Multiple (x EBITDA)', default:8, step:0.5},
+    {key:'exitEbitda', label:'Exit Year (Year 5) EBITDA ($M)', default:140, step:5},
+    {key:'entryDebtPct', label:'Debt % of Purchase Price', default:60, step:5},
+    {key:'remainingDebt', label:'Remaining Debt at Exit ($M)', default:250, step:10},
+  ], compute:(v)=>{
+    const entryEV = v.entryEbitda * v.entryMultiple;
+    const entryDebt = entryEV * (v.entryDebtPct/100);
+    const entryEquity = entryEV - entryDebt;
+    const exitEV = v.exitEbitda * v.exitMultiple;
+    const exitEquity = exitEV - v.remainingDebt;
+    const moic = entryEquity ? exitEquity/entryEquity : 0;
+    const irr = entryEquity>0 && moic>0 ? (Math.pow(moic, 1/5)-1)*100 : 0;
+    return { label:'MOIC / Approx. 5-Year IRR', display: moic.toFixed(2)+'x / '+irr.toFixed(1)+'%' };
+  }
+};
+
+const COMPS_CALC = {
+  inputs:[
+    {key:'targetEbitda', label:'Target EBITDA ($M)', default:80, step:5},
+    {key:'peerMedianMultiple', label:'Peer Median EV/EBITDA', default:9.5, step:0.5},
+    {key:'targetNetDebt', label:'Target Net Debt ($M)', default:120, step:10},
+    {key:'sharesOut', label:'Target Shares Outstanding (M)', default:50, step:5},
+  ], compute:(v)=>{
+    const impliedEV = v.targetEbitda * v.peerMedianMultiple;
+    const impliedEquity = impliedEV - v.targetNetDebt;
+    const perShare = v.sharesOut ? impliedEquity/v.sharesOut : 0;
+    return { label:'Implied Enterprise Value / Implied Share Price', display: '$'+impliedEV.toFixed(0)+'M / $'+perShare.toFixed(2) };
+  }
+};
+
+function dcfBuildHTML(){
+  return `
+  <div class="lesson-body">
+    <h2>Building a DCF, Step by Step</h2>
+    <p>A DCF (Discounted Cash Flow) values a company as the present value of all the cash it will generate in the future. Here's the actual build sequence, in the order you'd build it in a spreadsheet — using Anchor Robotics as the running example throughout.</p>
+
+    <h3>Step 1 — Build the Revenue Forecast</h3>
+    <p>Start with a 5-year revenue projection, driven by a growth rate assumption for each year (often declining over time, reflecting that high growth rates rarely persist indefinitely). Anchor Robotics starts at $500M in Year 1 revenue, with growth assumed to decelerate from 12% down to 6% by Year 5:</p>
+    <table class="model-table">
+      <tr><th></th><th>Year 1</th><th>Year 2</th><th>Year 3</th><th>Year 4</th><th>Year 5</th></tr>
+      <tr><td>Revenue Growth %</td><td>12.0%</td><td>10.0%</td><td>8.5%</td><td>7.0%</td><td>6.0%</td></tr>
+      <tr><td><strong>Revenue ($M)</strong></td><td><strong>$500</strong></td><td><strong>$550</strong></td><td><strong>$597</strong></td><td><strong>$638</strong></td><td><strong>$677</strong></td></tr>
+    </table>
+
+    <h3>Step 2 — Build Down to Unlevered Free Cash Flow</h3>
+    <p>Unlevered Free Cash Flow (UFCF) is the cash available to <em>all</em> capital providers — debt and equity holders alike — before any financing decisions. It deliberately excludes interest expense, which is exactly why it's called "unlevered": the DCF values the business itself, independent of how it happens to be financed.</p>
+    <table class="model-table">
+      <tr><th></th><th>Year 1</th><th>Year 3</th><th>Year 5</th></tr>
+      <tr><td>Revenue</td><td>$500</td><td>$597</td><td>$677</td></tr>
+      <tr><td>EBIT Margin</td><td>18%</td><td>19%</td><td>20%</td></tr>
+      <tr><td>EBIT</td><td>$90</td><td>$113</td><td>$135</td></tr>
+      <tr><td>Less: Taxes (25%)</td><td>($23)</td><td>($28)</td><td>($34)</td></tr>
+      <tr><td>= NOPAT</td><td>$68</td><td>$85</td><td>$102</td></tr>
+      <tr><td>Plus: D&amp;A</td><td>$25</td><td>$30</td><td>$35</td></tr>
+      <tr><td>Less: CapEx</td><td>($30)</td><td>($33)</td><td>($37)</td></tr>
+      <tr><td>Less: Increase in NWC</td><td>($8)</td><td>($9)</td><td>($10)</td></tr>
+      <tr><td><strong>= Unlevered FCF</strong></td><td><strong>$55</strong></td><td><strong>$73</strong></td><td><strong>$90</strong></td></tr>
+    </table>
+
+    <h3>Step 3 — Determine the Discount Rate (WACC)</h3>
+    <p>WACC (Weighted Average Cost of Capital) is the rate used to discount future cash flows back to today, reflecting the blended return required by both the company's debt and equity holders. WACC construction is covered in depth in the Fixed Income &amp; Credit Analysis and Time Value of Money modules — for this build, Anchor Robotics' WACC comes out to <strong>9%</strong>.</p>
+
+    <h3>Step 4 — Discount Each Year's FCF Back to Present Value</h3>
+    <p>Each year's UFCF is discounted back to today using the WACC: <code>PV = FCF / (1 + WACC)^n</code>, where n is the number of years in the future that cash flow occurs.</p>
+    <table class="model-table">
+      <tr><th></th><th>Year 1</th><th>Year 2</th><th>Year 3</th><th>Year 4</th><th>Year 5</th></tr>
+      <tr><td>Unlevered FCF</td><td>$55</td><td>$63</td><td>$73</td><td>$81</td><td>$90</td></tr>
+      <tr><td>Discount Factor (9%)</td><td>0.917</td><td>0.842</td><td>0.772</td><td>0.708</td><td>0.650</td></tr>
+      <tr><td><strong>PV of FCF</strong></td><td><strong>$50</strong></td><td><strong>$53</strong></td><td><strong>$56</strong></td><td><strong>$57</strong></td><td><strong>$58</strong></td></tr>
+    </table>
+    <p>Sum of PV of explicit-period FCFs: $50 + $53 + $56 + $57 + $58 = <strong>$274M</strong>.</p>
+
+    <h3>Step 5 — Calculate and Discount the Terminal Value</h3>
+    <p>Since a company doesn't stop existing after Year 5, the <strong>Terminal Value</strong> captures all cash flows beyond the explicit forecast period, using the Gordon Growth formula: <code>TV = Year 5 FCF × (1 + g) / (WACC − g)</code>, where g is a conservative long-term growth rate (often close to long-run GDP growth, here assumed at 2.5%).</p>
+    <p>Try it with the calculator below — this is exactly the terminal value math from this DCF:</p>
+    ${renderLessonCalcHTML(DCF_CALC, 900)}
+
+    <h3>Step 6 — Sum to Enterprise Value, Then Bridge to Per-Share Value</h3>
+    <p>Enterprise Value = PV of explicit FCFs + PV of Terminal Value = $274M + PV(Terminal Value). From there, the standard EV-to-equity-value bridge applies: subtract net debt, add back cash, divide by diluted shares outstanding to get a per-share value — the exact final output a DCF is built to produce.</p>
+  </div>
+  `;
+}
+
+function lboBuildHTML(){
+  return `
+  <div class="lesson-body">
+    <h2>Building an LBO Model, Step by Step</h2>
+    <p>An LBO (Leveraged Buyout) model answers one core question: if a PE firm buys this company using mostly debt, holds it for ~5 years, and sells it, what return does the equity investor actually earn? Here's the real build sequence.</p>
+
+    <h3>Step 1 — Sources &amp; Uses</h3>
+    <p>Every LBO starts with a Sources &amp; Uses table — where the money to buy the company comes from (Sources), and what it's spent on (Uses). These two sides must balance exactly.</p>
+    <table class="model-table">
+      <tr><th>Uses</th><th>$M</th><th>Sources</th><th>$M</th></tr>
+      <tr><td>Purchase of Equity (8.0x EBITDA)</td><td>$800</td><td>New Debt (60% of price)</td><td>$480</td></tr>
+      <tr><td>Transaction Fees</td><td>$20</td><td>Sponsor Equity</td><td>$340</td></tr>
+      <tr><td><strong>Total Uses</strong></td><td><strong>$820</strong></td><td><strong>Total Sources</strong></td><td><strong>$820</strong></td></tr>
+    </table>
+    <p>Anchor Robotics is being acquired at 8.0x its $100M EBITDA — an $800M purchase price. The deal is financed 60% with new debt ($480M) and 40% with the PE firm's own equity ($340M, after fees) — this heavy use of debt, relative to a company simply buying with 100% cash, is exactly what makes it a <em>leveraged</em> buyout.</p>
+
+    <h3>Step 2 — Project the Operating Performance</h3>
+    <p>Build a 5-year operating forecast, typically assuming steady EBITDA growth as the PE firm executes its value-creation plan (covered in the Private Equity module).</p>
+    <table class="model-table">
+      <tr><th></th><th>Year 1</th><th>Year 2</th><th>Year 3</th><th>Year 4</th><th>Year 5</th></tr>
+      <tr><td>EBITDA ($M)</td><td>$108</td><td>$117</td><td>$126</td><td>$133</td><td>$140</td></tr>
+    </table>
+
+    <h3>Step 3 — Build the Debt Paydown Schedule</h3>
+    <p>Each year, the company generates free cash flow that's used to pay down the debt taken on at entry — reducing leverage over the hold period and directly increasing the equity value captured at exit, since less debt outstanding means more of the exit proceeds flow to equity.</p>
+    <table class="model-table">
+      <tr><th></th><th>Year 1</th><th>Year 3</th><th>Year 5</th></tr>
+      <tr><td>Beginning Debt</td><td>$480</td><td>$410</td><td>$310</td></tr>
+      <tr><td>Less: Debt Paydown (from FCF)</td><td>($35)</td><td>($40)</td><td>($45)</td></tr>
+      <tr><td><strong>Ending Debt</strong></td><td><strong>$445</strong></td><td><strong>$370</strong></td><td><strong>$265</strong></td></tr>
+    </table>
+
+    <h3>Step 4 — Exit Assumptions</h3>
+    <p>At the end of the hold period (typically 5 years), the PE firm sells the company — usually assumed at the same multiple paid at entry (a conservative, common assumption, since betting on "multiple expansion" is considered a riskier, less controllable source of return). Exit Enterprise Value = Year 5 EBITDA × Exit Multiple, minus remaining debt = Exit Equity Value.</p>
+
+    <h3>Step 5 — Calculate Returns: MOIC and IRR</h3>
+    <p><strong>MOIC</strong> (Multiple on Invested Capital) = Exit Equity Value ÷ Initial Equity Invested — simply how many times the original investment came back. <strong>IRR</strong> (Internal Rate of Return) annualizes that same return over the actual hold period, making it comparable across deals of different lengths. Try the full calculation below with Anchor Robotics' numbers:</p>
+    ${renderLessonCalcHTML(LBO_CALC, 901)}
+    <p>A healthy LBO typically targets a 2.0-3.0x MOIC and a 20%+ IRR over a 4-6 year hold — adjust the inputs above to see exactly how sensitive returns are to entry multiple, leverage, and exit assumptions, which is precisely why PE deal teams spend so much time stress-testing these exact levers before committing capital.</p>
+  </div>
+  `;
+}
+
+function compsBuildHTML(){
+  return `
+  <div class="lesson-body">
+    <h2>Building a Comps Set, Step by Step</h2>
+    <p>A comparable companies analysis ("comps") values a company by looking at what similar, publicly traded companies are actually trading for in the market — a relative, market-based valuation approach, distinct from the DCF's intrinsic, cash-flow-based one.</p>
+
+    <h3>Step 1 — Select the Peer Set</h3>
+    <p>Good comps share genuine similarity in industry, business model, size, growth rate, and margin profile — a peer set of companies that don't actually resemble the target produces a misleading valuation range no matter how careful the rest of the math is. For Anchor Robotics (an industrial sensor/robotics company), the peer set would be other publicly traded industrial technology companies of similar scale — not, say, a consumer software company just because both happen to be "tech."</p>
+
+    <h3>Step 2 — Gather Each Peer's Financial Data</h3>
+    <p>For each peer, pull current market data: share price, shares outstanding (to get market cap), total debt, and cash (to bridge to Enterprise Value), plus EBITDA and revenue for the multiples.</p>
+    <table class="model-table">
+      <tr><th>Peer</th><th>EV ($M)</th><th>EBITDA ($M)</th><th>EV/EBITDA</th></tr>
+      <tr><td>Peer A</td><td>$950</td><td>$100</td><td>9.5x</td></tr>
+      <tr><td>Peer B</td><td>$1,240</td><td>$122</td><td>10.2x</td></tr>
+      <tr><td>Peer C</td><td>$680</td><td>$76</td><td>8.9x</td></tr>
+      <tr><td>Peer D</td><td>$1,050</td><td>$110</td><td>9.5x</td></tr>
+    </table>
+
+    <h3>Step 3 — Calculate Summary Statistics</h3>
+    <p>Across the peer set: mean EV/EBITDA ≈ <strong>9.5x</strong>, median ≈ <strong>9.5x</strong>. The median is generally preferred over the mean in practice, since it's less distorted by a single outlier peer trading unusually high or low.</p>
+
+    <h3>Step 4 — Apply the Multiple to the Target</h3>
+    <p>Apply the peer median multiple to Anchor Robotics' own EBITDA to get an implied valuation — then bridge from Enterprise Value to an implied per-share price the same way as in the DCF build. Try it below:</p>
+    ${renderLessonCalcHTML(COMPS_CALC, 902)}
+    <p><strong>Why comps and a DCF are used together, not as substitutes.</strong> A DCF says what a company is intrinsically worth based on its own projected cash flows; comps say what the market is currently willing to pay for similar businesses. Real valuation work — in banking, PE, and equity research alike — almost always presents both side by side, since a DCF that wildly disagrees with where real comparable companies trade is a signal worth investigating, not simply overriding with one method or the other.</p>
+  </div>
+  `;
+}
 
 function renderVerify(){
   mainArea.innerHTML = `
