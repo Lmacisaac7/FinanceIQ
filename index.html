@@ -1144,7 +1144,7 @@ const TRACKS = [
           return { label:'LIFO vs. FIFO COGS Difference (Illustrative)', display: '$'+diff.toLocaleString() };
         } } },
     ] },
-  { id:'t2', num:'05', title:'Financial Statement Analysis', blurb:'Turning filings into judgment — margins, leverage, and red flags.', hours:0.5,
+  { id:'t2', num:'04', title:'Financial Statement Analysis', blurb:'Turning filings into judgment — margins, leverage, and red flags.', hours:0.5,
     moduleQuestion:{ q:'A company\'s ratios look healthy, cash flow from operations has quietly lagged net income for three years, and one "non-recurring" charge appears every year. What should an analyst do next?', opts:['Ignore it since ratios look fine','Investigate further — these are exactly the earnings-quality and red-flag signals this module covers','Assume fraud immediately','Only act if the company is public'], answer:1 },
     quizBank:[
       { q:'The most useful way to read a financial ratio is:', opts:['As a single standalone number','Against its own trend and peers over time','Only in the year of an IPO','Never — ratios are unreliable'], answer:1 },
@@ -1380,7 +1380,7 @@ const TRACKS = [
         <p><strong>Why healthy skepticism toward non-GAAP figures is a genuinely valuable professional habit, not cynicism for its own sake.</strong> Non-GAAP metrics aren't inherently illegitimate or deceptive — they can genuinely provide useful additional context beyond GAAP figures alone. But because companies have real, understandable incentive to present the most flattering possible picture of their own performance, a rigorous analyst treats non-GAAP figures as a genuine starting point for further investigation via the reconciliation table, not as a final, trusted answer to simply accept at face value — precisely the same disciplined skepticism that underlies the quality-of-earnings and aggressive-accounting-detection skills covered earlier in this module.</p>`,
         quiz:{ q:'An "adjustment" or add-back that appears in a company\'s non-GAAP reconciliation in every consecutive quarter, despite being labeled one-time, should prompt an analyst to:', opts:['Accept the company\'s one-time labeling without further scrutiny', 'Question whether the item is genuinely one-time or actually a recurring cost being excluded from the adjusted figure', 'Assume the company has made an error requiring correction', 'Ignore the reconciliation table entirely'], answer:1 } },
     ] },
-  { id:'t3', num:'07', title:'Valuation & Modeling', blurb:'Build the models analysts are actually asked to build in interviews.', hours:0.75,
+  { id:'t3', num:'05', title:'Valuation & Modeling', blurb:'Build the models analysts are actually asked to build in interviews.', hours:0.75,
     moduleQuestion:{ q:'A DCF and a set of trading comps for the same company produce different Enterprise Values. What does this module teach about reconciling them?', opts:['One method must be wrong','Different methods answer different questions and are meant to be triangulated, not forced to match exactly','Always trust the DCF over comps','Always trust comps over the DCF'], answer:1 },
     quizBank:[
       { q:'In a 3-statement model, net income flows into which balance sheet line?', opts:['Cash','Retained earnings','Accounts payable','Inventory'], answer:1 },
@@ -1645,7 +1645,7 @@ const TRACKS = [
         <p><strong>Why this genuinely matters beyond just looking polished.</strong> A model reviewed under real time pressure — a VP wants three scenario changes run before a 9am client call — rewards whoever can make the changes and re-check the outputs fastest, and mouse-dependent navigation is measurably slower at scale than keyboard shortcuts once a model has hundreds of interconnected cells. This isn't a cosmetic skill: the actual analysts who move fastest through live model changes during a real deal are, without exception, the ones who stopped reaching for the mouse months earlier — which is exactly why this lesson exists as a deliberate practice target, not an optional tip at the end of a modeling course.</p>`,
         quiz:{ q:'What does the Ctrl + \` (grave accent) shortcut do in Excel, and why does it matter for reviewing a model?', opts:['It deletes all formulas in the workbook', 'It toggles between showing calculated values and showing the underlying formulas in every cell, useful for auditing a model\'s structure at a glance', 'It saves the file automatically', 'It has no real function in Excel'], answer:1 } },
     ] },
-  { id:'t4', num:'13', title:'Stock Market & Investing', blurb:'How markets actually move, priced from first principles.', hours:0.75,
+  { id:'t4', num:'09', title:'Stock Market & Investing', blurb:'How markets actually move, priced from first principles.', hours:0.75,
     moduleQuestion:{ q:'An investor diversifies across 20 tech stocks, adds some bonds, and dollar-cost averages into an index fund. Which risk have they addressed, and which remains?', opts:['Eliminated all risk entirely','Reduced idiosyncratic risk through diversification, but systematic market risk remains','Eliminated systematic risk only','Increased both types of risk'], answer:1 },
     quizBank:[
       { q:'A market order guarantees:', opts:['A specific price','Execution, but not price','Neither price nor execution','The lowest price of the day'], answer:1 },
@@ -1807,7 +1807,7 @@ const TRACKS = [
         <p><strong>Herding — following the crowd, even when it isn't genuinely informative.</strong> Individual investors, like the sell-side analysts covered in the Front-Office Career Paths module elsewhere in this curriculum, are genuinely susceptible to <strong>herding</strong> — buying what's currently popular and rising, partly from genuine social proof (if everyone else is buying, maybe they know something), and partly from the simple discomfort of holding a contrarian position while watching others seemingly profit. Recognizing that herding can drive prices disconnected from genuine underlying value — and that being early to a genuinely good idea often means being alone in it for a while — is exactly the kind of psychological discipline that separates investors capable of buying genuine value during periods of general pessimism from those who can only act once a trend has already become widely popular and, often, less attractively priced.</p>`,
         quiz:{ q:'Anchoring to an original purchase price when deciding whether to sell a stock reflects:', opts:['A rational, relevant consideration for the investment decision', 'A behavioral bias, since the original purchase price has no actual bearing on the stock\'s correct forward-looking value', 'A tax-optimal strategy in all circumstances', 'A factor unrelated to investor psychology'], answer:1 } },
     ] },
-  { id:'t5', num:'14', title:'Trading & Technical Analysis', blurb:'Chart reading, risk sizing, and the discipline that keeps accounts alive.', hours:0.5,
+  { id:'t5', num:'10', title:'Trading & Technical Analysis', blurb:'Chart reading, risk sizing, and the discipline that keeps accounts alive.', hours:0.5,
     moduleQuestion:{ q:'A trader has a solid position-sizing rule and correctly identifies a bullish chart pattern, but still loses money over time. What does this module say is most likely happening?', opts:['The chart pattern was fake','A breakdown in trading psychology — deviating from the plan under pressure — despite good technical and risk rules','Position sizing is irrelevant','Options were involved'], answer:1 },
     quizBank:[
       { q:'A candlestick pattern by itself:', opts:['Guarantees future price direction','Describes probability, not certainty','Is only useful for options','Replaces the need for risk management'], answer:1 },
@@ -2001,7 +2001,7 @@ const TRACKS = [
         <p><strong>Why algorithmic trading hasn't eliminated the human trader, but has genuinely changed the job.</strong> Consistent with the electronic trading content covered in the Front-Office Career Paths module elsewhere in this curriculum, algorithmic trading has automated much of the routine, high-volume flow that used to require manual execution — but humans remain genuinely essential for building, monitoring, and adjusting these systems, handling situations the algorithm wasn't designed for, and executing larger, more complex, or less liquid trades where human judgment still adds real value beyond what a purely systematic rule set can capture.</p>`,
         quiz:{ q:'An execution algorithm, as distinct from a signal-generation trading strategy, is primarily focused on:', opts:['Deciding what asset to trade next', 'How to execute a large order without moving the market unfavorably', 'Predicting future price direction', 'Replacing the need for any backtesting'], answer:1 } },
     ] },
-  { id:'t6', num:'15', title:'Wealth & Personal Finance', blurb:'The playbook for building and protecting money over decades.', hours:0.75,
+  { id:'t6', num:'11', title:'Wealth & Personal Finance', blurb:'The playbook for building and protecting money over decades.', hours:0.75,
     moduleQuestion:{ q:'Someone maximizes their Roth IRA, allocates by life stage, and pays off high-interest debt with the avalanche method. What connects all three of these decisions?', opts:['They are unrelated topics','Each one reduces a specific drag on long-term wealth — taxes, sequence-of-returns risk, and interest cost','Only the Roth IRA actually matters','They only apply to retirees'], answer:1 },
     quizBank:[
       { q:'A Roth IRA is generally taxed:', opts:['Never, on either contribution or withdrawal','On contribution, tax-free on qualified withdrawal','On withdrawal only, like a Traditional IRA','Twice — on contribution and withdrawal'], answer:1 },
@@ -2356,7 +2356,7 @@ const TRACKS = [
         <p><strong>Why understanding these differences helps a candidate calibrate their own strategy realistically.</strong> A candidate assuming the undergraduate recruiting timeline and process applies identically at the MBA or experienced-hire level — or vice versa — risks genuinely miscalibrated preparation, whether that means starting too late for a compressed undergraduate cycle, or over-preparing generic technical drills for an experienced-hire process that will actually weight specific past accomplishments far more heavily. Recognizing which recruiting context actually applies is exactly the first, practical step toward building a genuinely well-calibrated preparation strategy, rather than applying a one-size-fits-all approach across meaningfully different hiring processes.</p>`,
         quiz:{ q:'Experienced-hire recruiting, compared to undergraduate recruiting, typically evaluates candidates more heavily on:', opts:['Raw potential with no track record required', 'A genuine, demonstrated track record of specific, relevant accomplishments', 'An identical set of criteria to undergraduate hiring', 'Standardized test scores exclusively'], answer:1 } },
     ] },
-  { id:'t8', num:'16', title:'Real Estate Finance & Investing', blurb:'Underwriting property deals with the same rigor as a corporate model.', hours:0.5,
+  { id:'t8', num:'12', title:'Real Estate Finance & Investing', blurb:'Underwriting property deals with the same rigor as a corporate model.', hours:0.5,
     moduleQuestion:{ q:'A real estate deal has a low cap rate, is financed at 75% leverage, and its GP earns a promote above the preferred return. What does this combination suggest about the deal?', opts:['Nothing — these are unrelated details','The market sees it as lower-risk (low cap rate), leverage is amplifying equity returns, and the GP is incentivized to outperform the preferred return','The deal is guaranteed to fail','Leverage always reduces returns'], answer:1 },
     quizBank:[
       { q:'Which approach values a property based on what similar nearby properties have recently sold for?', opts:['Income approach','Cost approach','Sales comparison approach','Replacement approach'], answer:2 },
@@ -2529,7 +2529,7 @@ const TRACKS = [
         <p><strong>Why value-add and distressed strategies carry genuinely higher execution risk than simply buying stabilized assets.</strong> Unlike acquiring an already-stabilized property with predictable in-place cash flow, both value-add and distressed strategies depend heavily on actually executing a specific business plan correctly — a renovation program running over budget or behind schedule, or a distressed asset's underlying problems turning out to be more severe than initially diligenced, can meaningfully erode or eliminate the expected return, which is exactly why these strategies are generally considered higher-risk, higher-potential-return approaches within real estate investing, requiring genuine operational expertise beyond simply underwriting a stabilized asset's existing cash flow.</p>`,
         quiz:{ q:'In a value-add real estate strategy, increasing a property\'s NOI through renovation and improved management primarily creates value by:', opts:['Having no effect on the property\'s valuation', 'Increasing the property\'s value directly, consistent with cap rate mechanics, independent of broader market appreciation', 'Only affecting the property\'s physical appearance with no financial impact', 'Requiring the cap rate itself to change'], answer:1 } },
     ] },
-  { id:'t9', num:'17', title:'Financial Planning & Analysis (FP&A)', blurb:'The internal finance team every company actually depends on.', hours:0.75,
+  { id:'t9', num:'13', title:'Financial Planning & Analysis (FP&A)', blurb:'The internal finance team every company actually depends on.', hours:0.75,
     moduleQuestion:{ q:'FP&A builds a budget, tracks variances against it monthly, and reports a small set of KPIs to each business partner. What\'s the common purpose behind all three activities?', opts:['Compliance with GAAP','Turning the business\'s plans into numbers, and turning results back into decisions leadership can act on','Replacing the accounting department','None of these are related'], answer:1 },
     quizBank:[
       { q:'How does FP&A differ from traditional accounting?', opts:['FP&A only handles taxes', 'FP&A is forward-looking (budgets, forecasts) and business-partnering, while accounting is primarily backward-looking', 'They are the same function with different names', 'FP&A does not use financial statements'], answer:1 },
@@ -3153,7 +3153,7 @@ const MINI_MODULES = [
     ],
   },
 
-  { id:'m16', accent:'#B85C38', num:'20', title:'Front-Office Career Paths: Sales &amp; Trading and Equity Research', blurb:'What a trading floor and a research desk actually do day to day, and how both compare to investment banking.', hours:0.75,
+  { id:'m16', accent:'#B85C38', num:'18', title:'Front-Office Career Paths: Sales &amp; Trading and Equity Research', blurb:'What a trading floor and a research desk actually do day to day, and how both compare to investment banking.', hours:0.75,
     lessons:[
       { id:'l1', title:'Sales &amp; Trading: Desk Structure, Market Making &amp; The Sales-Trader Role',
         body:`<p>Alongside investment banking, <strong>Sales &amp; Trading (S&amp;T)</strong> is one of the classic front-office paths at a large bank — but it's a fundamentally different job. Where IB advises companies on transactions that take months to close, S&amp;T operates in real time, buying and selling securities on behalf of clients (and sometimes the bank itself) throughout the trading day. The desk is organized by product: <strong>rates</strong> (government bonds, interest rate derivatives), <strong>credit</strong> (corporate bonds, credit derivatives), <strong>equities</strong> (stocks, equity derivatives), and <strong>FX</strong> (currencies) each have their own trading desks, often further split by specific sub-products within each.</p>
@@ -3398,7 +3398,7 @@ const MINI_MODULES = [
     ],
   },
 
-  { id:'m14', accent:'#1E6B8C', num:'19', title:'Fixed Income &amp; Credit Analysis', blurb:'Bonds, yield, credit ratings, and the capital-structure logic every lender and credit analyst actually uses.', hours:0.75,
+  { id:'m14', accent:'#1E6B8C', num:'16', title:'Fixed Income &amp; Credit Analysis', blurb:'Bonds, yield, credit ratings, and the capital-structure logic every lender and credit analyst actually uses.', hours:0.75,
     lessons:[
       { id:'l1', title:'Bond Pricing &amp; Yield Mechanics',
         body:`<p>A bond is a loan, structured as a tradable security. The issuer borrows money upfront (the <strong>face value</strong>, or par value, typically $1,000 per bond) and promises two things in return: periodic <strong>coupon</strong> payments (interest, usually paid semiannually) and repayment of the face value at <strong>maturity</strong>. Everything else in fixed income — pricing, yield, risk — is really just different ways of analyzing that one simple promise.</p>
@@ -3658,7 +3658,7 @@ const MINI_MODULES = [
     ],
   },
 
-  { id:'m15', accent:'#8B3A5C', num:'20', title:'M&amp;A Deal Structures &amp; Accretion/Dilution Analysis', blurb:'Why deals happen, how they get structured and paid for, and the single most common technical math question in M&amp;A interviews.', hours:0.75,
+  { id:'m15', accent:'#8B3A5C', num:'17', title:'M&amp;A Deal Structures &amp; Accretion/Dilution Analysis', blurb:'Why deals happen, how they get structured and paid for, and the single most common technical math question in M&amp;A interviews.', hours:0.75,
     lessons:[
       { id:'l1', title:'Why Deals Happen: Buyer Types &amp; Synergies',
         body:`<p>Every M&amp;A deal starts with a buyer believing the combined company will be worth more than the two companies are worth apart. Buyers generally fall into two categories, and understanding which one is bidding explains most of a deal's logic and pricing. A <strong>strategic buyer</strong> is an operating company acquiring another business to fit into its existing operations — typically a competitor, supplier, or adjacent business — and can justify paying a higher price because it expects to extract real operational <strong>synergies</strong> from combining the two businesses. A <strong>financial buyer</strong> (typically a private equity firm, covered in depth elsewhere in this curriculum) acquires a business as a standalone investment, using leverage and an eventual exit to generate returns, without the same built-in operational synergies a strategic buyer can access.</p>
@@ -4020,7 +4020,7 @@ const MINI_MODULES = [
     ],
   },
 
-    { id:'m10', accent:'#7A5C3E', num:'08', title:'Private Equity: Fund Structure &amp; Deal Process', blurb:'How PE funds are structured and paid, the strategy spectrum from buyout to venture, and the real deal process from sourcing to the first 100 days post-close.', hours:0.85,
+    { id:'m10', accent:'#7A5C3E', num:'07', title:'Private Equity: Fund Structure &amp; Deal Process', blurb:'How PE funds are structured and paid, the strategy spectrum from buyout to venture, and the real deal process from sourcing to the first 100 days post-close.', hours:0.85,
     lessons:[
 { id:'l1', title:'Fund Structure &amp; the LP/GP Lifecycle',
         body:`<p>A private equity fund is a legal entity, typically structured as a limited partnership, that raises a fixed pool of capital from investors — <strong>Limited Partners (LPs)</strong>, commonly pension funds, university endowments, sovereign wealth funds, insurance companies, and wealthy family offices — and deploys it into acquisitions over the fund's life. The firm running the fund is the <strong>General Partner (GP)</strong>, responsible for sourcing deals, managing portfolio companies, and eventually selling them — the same GP/LP relationship covered in the Real Estate track's waterfall lesson, just applied here to operating company buyouts instead of individual properties.</p>
@@ -4176,7 +4176,7 @@ const MINI_MODULES = [
     ],
   },
 
-  { id:'m5', accent:'#2F8F6B', num:'18', title:'Comparable Company &amp; Precedent Transaction Analysis', blurb:'The deep-dive Track 03 only gives you the overview of — calendarization, synergy adjustments, and building a real football field.', hours:0.5,
+  { id:'m5', accent:'#2F8F6B', num:'14', title:'Comparable Company &amp; Precedent Transaction Analysis', blurb:'The deep-dive Track 03 only gives you the overview of — calendarization, synergy adjustments, and building a real football field.', hours:0.5,
     lessons:[
       { id:'l1', title:'Building a Real Trading Comps Set: Calendarization &amp; Beyond',
         body:`<p>Track 03's Comps & Precedent Transactions lesson covers the fundamentals — screening criteria, control premiums, why trading comps and precedent transactions produce different valuation ranges. This module goes deeper into the mechanics a real comps analyst has to get right before any multiple can be trusted, starting with a problem most introductions to comps skip entirely: companies don't all report on the same fiscal calendar.</p>
@@ -4328,7 +4328,7 @@ const MINI_MODULES = [
     ],
   },
 
-  { id:'m7', accent:'#A6483D', num:'12', title:'Wealth Management: Industry, Practice &amp; Career', blurb:'The business, the client process, and the technology behind managing money for individuals and families — not personal finance, the profession itself.', hours:0.5,
+  { id:'m7', accent:'#A6483D', num:'08', title:'Wealth Management: Industry, Practice &amp; Career', blurb:'The business, the client process, and the technology behind managing money for individuals and families — not personal finance, the profession itself.', hours:0.5,
     lessons:[
       { id:'l1', title:'The Wealth Management Business Model',
         body:`<p>Wealth management is a distinct business from investment banking or asset management — instead of advising companies or managing pooled institutional capital, it means managing money and building financial plans for individuals and families, and the business model is built entirely around long-term client relationships rather than one-off transactions.</p>
@@ -4487,7 +4487,7 @@ const MINI_MODULES = [
     ],
   },
 
-  { id:'m6', accent:'#8355C7', num:'19', title:'Investment Banking: Career, Culture &amp; Compensation', blurb:'What IB actually is, the hierarchy, the hours, the day-to-day, and what it pays — a full picture before you commit to it.', hours:0.5,
+  { id:'m6', accent:'#8355C7', num:'15', title:'Investment Banking: Career, Culture &amp; Compensation', blurb:'What IB actually is, the hierarchy, the hours, the day-to-day, and what it pays — a full picture before you commit to it.', hours:0.5,
     lessons:[
       { id:'l1', title:'What Investment Banking Actually Is',
         body:`<p>Investment banking, at its core, is an advisory business: banks get paid fees for helping companies raise capital (issuing stock or debt) and complete M&A transactions (buying, selling, or merging with other companies). Unlike a hedge fund or a private equity firm, an investment bank isn't investing its own capital in these deals — it's advising a client and collecting a fee for that advice, typically a percentage of the deal's total value. This "advisory, not principal" distinction is the single most important thing separating IB from the buy-side roles (PE, hedge funds, asset management) covered elsewhere in this curriculum.</p>
