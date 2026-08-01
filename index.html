@@ -7509,31 +7509,57 @@ function fsmBuildHTML(){
   return `
   <div class="lesson-body">
     <h2>Building a 3-Statement Model, Step by Step</h2>
-    <p>A 3-statement model links the Income Statement, Balance Sheet, and Cash Flow Statement into one connected, dynamic model — the foundation every DCF, LBO, and merger model in this section is actually built on top of.</p>
+    <p>A 3-statement model links the Income Statement, Balance Sheet, and Cash Flow Statement into one connected, dynamic model — the foundation every DCF, LBO, and merger model in this section is actually built on top of. Every other model in this section assumes you can build this one first.</p>
 
     <h3>Step 1 — Project the Income Statement</h3>
-    <p>Start with a revenue forecast, then build down through the cost structure to net income — the exact same build sequence covered in the curriculum's Financial Statement Analysis module, just extended forward into future periods rather than analyzing historical results.</p>
+    <p>Start with a revenue forecast built off real drivers (unit growth × price, or a top-line growth rate assumption), then build down through the cost structure to net income. Anchor Robotics grows revenue roughly 10% annually, with COGS held at a stable 58-60% of revenue and operating expenses scaling more slowly than revenue as the business gains operating leverage:</p>
     <table class="model-table">
-      <tr><th></th><th>Year 1</th><th>Year 2</th><th>Year 3</th></tr>
-      <tr><td>Revenue</td><td>$500</td><td>$550</td><td>$597</td></tr>
-      <tr><td>COGS</td><td>($300)</td><td>($325)</td><td>($349)</td></tr>
-      <tr><td>Gross Profit</td><td>$200</td><td>$225</td><td>$248</td></tr>
-      <tr><td>Operating Expenses</td><td>($90)</td><td>($96)</td><td>($102)</td></tr>
-      <tr><td>EBIT</td><td>$110</td><td>$129</td><td>$146</td></tr>
-      <tr><td>Interest Expense</td><td>($15)</td><td>($14)</td><td>($13)</td></tr>
-      <tr><td>Taxes (25%)</td><td>($24)</td><td>($29)</td><td>($33)</td></tr>
-      <tr><td><strong>Net Income</strong></td><td><strong>$71</strong></td><td><strong>$86</strong></td><td><strong>$100</strong></td></tr>
+      <tr><th></th><th>Year 1</th><th>Year 2</th><th>Year 3</th><th>Year 4</th><th>Year 5</th></tr>
+      <tr><td>Revenue</td><td>$500</td><td>$550</td><td>$597</td><td>$644</td><td>$689</td></tr>
+      <tr><td>Revenue Growth %</td><td>—</td><td>10.0%</td><td>8.5%</td><td>8.0%</td><td>7.0%</td></tr>
+      <tr><td>COGS</td><td>($300)</td><td>($325)</td><td>($349)</td><td>($373)</td><td>($393)</td></tr>
+      <tr><td>Gross Profit</td><td>$200</td><td>$225</td><td>$248</td><td>$271</td><td>$296</td></tr>
+      <tr><td>Operating Expenses</td><td>($90)</td><td>($96)</td><td>($102)</td><td>($108)</td><td>($114)</td></tr>
+      <tr><td>EBIT</td><td>$110</td><td>$129</td><td>$146</td><td>$163</td><td>$182</td></tr>
+      <tr><td>Interest Expense</td><td>($15)</td><td>($14)</td><td>($13)</td><td>($12)</td><td>($10)</td></tr>
+      <tr><td>Pre-Tax Income</td><td>$95</td><td>$115</td><td>$133</td><td>$151</td><td>$172</td></tr>
+      <tr><td>Taxes (25%)</td><td>($24)</td><td>($29)</td><td>($33)</td><td>($38)</td><td>($43)</td></tr>
+      <tr><td><strong>Net Income</strong></td><td><strong>$71</strong></td><td><strong>$86</strong></td><td><strong>$100</strong></td><td><strong>$113</strong></td><td><strong>$129</strong></td></tr>
     </table>
 
-    <h3>Step 2 — Build the Balance Sheet and the Working Capital Schedule</h3>
-    <p>Each balance sheet line either stays flat, grows with a driver (like Accounts Receivable growing with revenue), or is directly linked from another statement (Retained Earnings pulls from Net Income, Cash pulls from the Cash Flow Statement). Working capital accounts — Accounts Receivable, Inventory, Accounts Payable — are typically projected using turnover ratios (like Days Sales Outstanding) rather than simply growing a flat percentage each year.</p>
+    <h3>Step 2 — Build the Working Capital Schedule</h3>
+    <p>Working capital accounts are driven off turnover ratios calculated from historical actuals, then held constant (or drifted slightly) going forward — not simply grown at the same rate as revenue, which would silently bake in an unrealistic assumption that collection and payment behavior never changes.</p>
+    <table class="model-table">
+      <tr><th></th><th>Driver</th><th>Year 1</th><th>Year 3</th><th>Year 5</th></tr>
+      <tr><td>Accounts Receivable</td><td>45 Days Sales Outstanding</td><td>$62</td><td>$74</td><td>$85</td></tr>
+      <tr><td>Inventory</td><td>60 Days Inventory Outstanding</td><td>$49</td><td>$57</td><td>$65</td></tr>
+      <tr><td>Accounts Payable</td><td>40 Days Payable Outstanding</td><td>($33)</td><td>($38)</td><td>($43)</td></tr>
+      <tr><td><strong>Net Working Capital</strong></td><td></td><td><strong>$78</strong></td><td><strong>$93</strong></td><td><strong>$107</strong></td></tr>
+    </table>
+    <p>The <em>change</em> in net working capital each year — not the balance itself — is what actually flows onto the Cash Flow Statement: a growing NWC balance means cash is being tied up in the business (a use of cash), exactly the mechanic covered in the DCF build below.</p>
 
-    <h3>Step 3 — Build the Cash Flow Statement, Linking All Three Together</h3>
-    <p>The Cash Flow Statement starts with Net Income (from the Income Statement), adjusts for non-cash items and working capital changes (from the Balance Sheet), and the resulting ending cash balance flows back onto the Balance Sheet — the exact linkage that makes this a genuine, dynamic 3-statement model rather than three separate, disconnected spreadsheets. Try the core mechanic below:</p>
+    <h3>Step 3 — Build the PP&amp;E and Debt Schedules</h3>
+    <p>Two supporting schedules roll forward period to period rather than being projected independently each year. The <strong>PP&amp;E schedule</strong>: Beginning PP&amp;E + CapEx − Depreciation = Ending PP&amp;E, with Depreciation flowing back up to reduce EBIT on the Income Statement (as a non-cash expense) and CapEx flowing to the Cash Flow Statement as an investing outflow. The <strong>debt schedule</strong>: Beginning Debt − Mandatory/Optional Paydown = Ending Debt, with the average balance driving Interest Expense on the Income Statement — the exact circularity (interest depends on the debt balance, which depends on cash flow, which depends on interest) covered in the Valuation &amp; Modeling module's dedicated circularity lesson.</p>
+
+    <h3>Step 4 — Build the Cash Flow Statement, Linking All Three Together</h3>
+    <p>The Cash Flow Statement starts with Net Income (from the Income Statement), adjusts for non-cash items and working capital changes (from the Balance Sheet schedules), and the resulting ending cash balance flows back onto the Balance Sheet — the exact linkage that makes this a genuine, dynamic 3-statement model rather than three separate, disconnected spreadsheets.</p>
+    <table class="model-table">
+      <tr><th></th><th>Year 1</th></tr>
+      <tr><td>Net Income</td><td>$71</td></tr>
+      <tr><td>+ Depreciation</td><td>$25</td></tr>
+      <tr><td>− Increase in NWC</td><td>($8)</td></tr>
+      <tr><td><strong>Cash From Operations</strong></td><td><strong>$88</strong></td></tr>
+      <tr><td>− CapEx</td><td>($30)</td></tr>
+      <tr><td><strong>Cash From Investing</strong></td><td><strong>($30)</strong></td></tr>
+      <tr><td>− Debt Paydown</td><td>($10)</td></tr>
+      <tr><td><strong>Cash From Financing</strong></td><td><strong>($10)</strong></td></tr>
+      <tr><td><strong>Net Change in Cash</strong></td><td><strong>$48</strong></td></tr>
+    </table>
+    <p>Try the core linkage mechanic below — beginning cash plus each section's net cash flow rolls forward to become the cash balance reported on the Balance Sheet:</p>
     ${renderLessonCalcHTML(FSM_CALC, 899)}
 
-    <h3>Step 4 — Check That the Balance Sheet Actually Balances</h3>
-    <p>Every well-built model includes an explicit balance check row confirming Assets = Liabilities + Equity in every single projected period — consistent with the model-auditing discipline covered in the Valuation &amp; Modeling module elsewhere in this curriculum. If the check ever shows FALSE, there's a genuine linkage error somewhere in the model that needs to be found before trusting any output built on top of it.</p>
+    <h3>Step 5 — Check That the Balance Sheet Actually Balances</h3>
+    <p>Every well-built model includes an explicit balance check row confirming Assets = Liabilities + Equity in every single projected period — consistent with the model-auditing discipline covered in the Valuation &amp; Modeling module elsewhere in this curriculum. If the check ever shows FALSE, there's a genuine linkage error somewhere in the model — most commonly a working capital or debt schedule item that isn't actually flowing through to the Cash Flow Statement correctly — that needs to be found and fixed before trusting any output built on top of it.</p>
   </div>
   `;
 }
@@ -7584,9 +7610,29 @@ function dcfBuildHTML(){
     <p>Since a company doesn't stop existing after Year 5, the <strong>Terminal Value</strong> captures all cash flows beyond the explicit forecast period, using the Gordon Growth formula: <code>TV = Year 5 FCF × (1 + g) / (WACC − g)</code>, where g is a conservative long-term growth rate (often close to long-run GDP growth, here assumed at 2.5%).</p>
     <p>Try it with the calculator below — this is exactly the terminal value math from this DCF:</p>
     ${renderLessonCalcHTML(DCF_CALC, 900)}
+    <p><strong>Cross-checking with the exit multiple method.</strong> A second, independent way to estimate terminal value: apply a reasonable exit EBITDA multiple (say, 8x, based on where comparable companies trade — directly connecting to the Trading Comps build elsewhere in this section) to Year 5 EBITDA. If Year 5 EBITDA is $155M, an 8x exit multiple implies a terminal value of $1,240M — compare this against the Gordon Growth result above. If the two methods produce wildly different terminal values, it's a real signal that one of the underlying assumptions (the perpetuity growth rate, or the exit multiple) is out of step with the other, worth reconciling before trusting either number in isolation.</p>
 
     <h3>Step 6 — Sum to Enterprise Value, Then Bridge to Per-Share Value</h3>
-    <p>Enterprise Value = PV of explicit FCFs + PV of Terminal Value = $274M + PV(Terminal Value). From there, the standard EV-to-equity-value bridge applies: subtract net debt, add back cash, divide by diluted shares outstanding to get a per-share value — the exact final output a DCF is built to produce.</p>
+    <p>Enterprise Value = PV of explicit FCFs + PV of Terminal Value. Using the Gordon Growth terminal value of roughly $1,417M (from the calculator above at the default 9% WACC and 2.5% growth), discounted back 5 years at 9% ≈ $921M in present value. Total Enterprise Value = $274M + $921M = <strong>$1,195M</strong>. From there, the standard EV-to-equity-value bridge applies:</p>
+    <table class="model-table">
+      <tr><td>Enterprise Value</td><td>$1,195</td></tr>
+      <tr><td>Less: Total Debt</td><td>($180)</td></tr>
+      <tr><td>Plus: Cash &amp; Equivalents</td><td>$65</td></tr>
+      <tr><td><strong>Equity Value</strong></td><td><strong>$1,080</strong></td></tr>
+      <tr><td>÷ Diluted Shares Outstanding</td><td>27.0</td></tr>
+      <tr><td><strong>Implied Value Per Share</strong></td><td><strong>$40.00</strong></td></tr>
+    </table>
+    <p>That implied $40.00 per-share value is the DCF's actual final output — the number an analyst compares against the stock's current trading price to form a view on whether it's under- or over-valued.</p>
+
+    <h3>Step 7 — Sensitize the Output Against Its Two Most Important Assumptions</h3>
+    <p>A DCF's output is genuinely sensitive to small changes in WACC and terminal growth rate — exactly why no serious DCF is presented as a single point estimate. A sensitivity table (or "data table") shows the implied share price across a range of both inputs simultaneously:</p>
+    <table class="model-table">
+      <tr><th>WACC vs. Growth</th><th>2.0%</th><th>2.5%</th><th>3.0%</th></tr>
+      <tr><td>8.0%</td><td>$46.80</td><td>$49.70</td><td>$53.20</td></tr>
+      <tr><td>9.0%</td><td>$38.10</td><td>$40.00</td><td>$42.10</td></tr>
+      <tr><td>10.0%</td><td>$31.90</td><td>$33.20</td><td>$34.60</td></tr>
+    </table>
+    <p>Presenting a range like this — rather than a single implied price — is exactly what separates a rigorous DCF from a falsely precise one; the honest output of a DCF is a reasonable valuation range grounded in explicit, stated assumptions, not a single number presented with more confidence than the underlying inputs actually justify.</p>
   </div>
   `;
 }
@@ -7615,21 +7661,44 @@ function lboBuildHTML(){
     </table>
 
     <h3>Step 3 — Build the Debt Paydown Schedule</h3>
-    <p>Each year, the company generates free cash flow that's used to pay down the debt taken on at entry — reducing leverage over the hold period and directly increasing the equity value captured at exit, since less debt outstanding means more of the exit proceeds flow to equity.</p>
+    <p>Each year, the company generates free cash flow that's used to pay down the debt taken on at entry (a "cash flow sweep") — reducing leverage over the hold period and directly increasing the equity value captured at exit, since less debt outstanding means more of the exit proceeds flow to equity rather than to lenders.</p>
     <table class="model-table">
-      <tr><th></th><th>Year 1</th><th>Year 3</th><th>Year 5</th></tr>
-      <tr><td>Beginning Debt</td><td>$480</td><td>$410</td><td>$310</td></tr>
-      <tr><td>Less: Debt Paydown (from FCF)</td><td>($35)</td><td>($40)</td><td>($45)</td></tr>
-      <tr><td><strong>Ending Debt</strong></td><td><strong>$445</strong></td><td><strong>$370</strong></td><td><strong>$265</strong></td></tr>
+      <tr><th></th><th>Year 1</th><th>Year 2</th><th>Year 3</th><th>Year 4</th><th>Year 5</th></tr>
+      <tr><td>Beginning Debt</td><td>$480</td><td>$445</td><td>$405</td><td>$360</td><td>$308</td></tr>
+      <tr><td>EBITDA</td><td>$108</td><td>$117</td><td>$126</td><td>$133</td><td>$140</td></tr>
+      <tr><td>Less: Cash Interest</td><td>($38)</td><td>($36)</td><td>($32)</td><td>($29)</td><td>($25)</td></tr>
+      <tr><td>Less: CapEx &amp; Taxes</td><td>($35)</td><td>($36)</td><td>($38)</td><td>($39)</td><td>($41)</td></tr>
+      <tr><td>Free Cash Flow for Paydown</td><td>$35</td><td>$40</td><td>$45</td><td>$52</td><td>$58</td></tr>
+      <tr><td><strong>Ending Debt</strong></td><td><strong>$445</strong></td><td><strong>$405</strong></td><td><strong>$360</strong></td><td><strong>$308</strong></td><td><strong>$250</strong></td></tr>
+      <tr><td>Leverage (Debt/EBITDA)</td><td>4.1x</td><td>3.5x</td><td>2.9x</td><td>2.3x</td><td>1.8x</td></tr>
     </table>
+    <p>Notice leverage falls from 4.4x at entry to 1.8x by Year 5 purely from paying down debt with the company's own cash flow — no additional equity was ever contributed to make that happen, which is exactly the mechanic that makes debt paydown one of an LBO's three core return drivers.</p>
 
     <h3>Step 4 — Exit Assumptions</h3>
     <p>At the end of the hold period (typically 5 years), the PE firm sells the company — usually assumed at the same multiple paid at entry (a conservative, common assumption, since betting on "multiple expansion" is considered a riskier, less controllable source of return). Exit Enterprise Value = Year 5 EBITDA × Exit Multiple, minus remaining debt = Exit Equity Value.</p>
+    <table class="model-table">
+      <tr><td>Year 5 EBITDA</td><td>$140</td></tr>
+      <tr><td>× Exit Multiple</td><td>8.0x</td></tr>
+      <tr><td><strong>Exit Enterprise Value</strong></td><td><strong>$1,120</strong></td></tr>
+      <tr><td>Less: Remaining Debt</td><td>($250)</td></tr>
+      <tr><td><strong>Exit Equity Value</strong></td><td><strong>$870</strong></td></tr>
+    </table>
 
     <h3>Step 5 — Calculate Returns: MOIC and IRR</h3>
     <p><strong>MOIC</strong> (Multiple on Invested Capital) = Exit Equity Value ÷ Initial Equity Invested — simply how many times the original investment came back. <strong>IRR</strong> (Internal Rate of Return) annualizes that same return over the actual hold period, making it comparable across deals of different lengths. Try the full calculation below with Anchor Robotics' numbers:</p>
     ${renderLessonCalcHTML(LBO_CALC, 901)}
     <p>A healthy LBO typically targets a 2.0-3.0x MOIC and a 20%+ IRR over a 4-6 year hold — adjust the inputs above to see exactly how sensitive returns are to entry multiple, leverage, and exit assumptions, which is precisely why PE deal teams spend so much time stress-testing these exact levers before committing capital.</p>
+
+    <h3>Step 6 — Attribute Returns to Their Actual Source</h3>
+    <p>A rigorous LBO analysis doesn't stop at the final MOIC — it decomposes <em>where</em> the return actually came from, since the three levers carry genuinely different risk profiles: EBITDA growth ($340M → $870M's growth component) and debt paydown ($230M) are both largely within the sponsor's own operational control, while multiple expansion (assumed at $0 here, since exit multiple was held flat) depends on market conditions the sponsor can't control at all.</p>
+    <table class="model-table">
+      <tr><th>Source of Equity Value Growth</th><th>$M</th><th>% of Total</th></tr>
+      <tr><td>EBITDA Growth</td><td>$256</td><td>48%</td></tr>
+      <tr><td>Debt Paydown</td><td>$230</td><td>43%</td></tr>
+      <tr><td>Multiple Expansion</td><td>$44</td><td>8%</td></tr>
+      <tr><td><strong>Total Equity Value Created</strong></td><td><strong>$530</strong></td><td><strong>100%</strong></td></tr>
+    </table>
+    <p>A deal where most of the return comes from operational improvement and deleveraging — rather than simply hoping to sell at a richer multiple than was paid at entry — is generally considered a more durable, defensible investment thesis, exactly the kind of return attribution a sponsor presents to its own investment committee before committing capital to a deal.</p>
   </div>
   `;
 }
@@ -7644,21 +7713,34 @@ function tradingCompsBuildHTML(){
     <p>Good comps share genuine similarity in industry, business model, size, growth rate, and margin profile — a peer set of companies that don't actually resemble the target produces a misleading valuation range no matter how careful the rest of the math is. For Anchor Robotics (an industrial sensor/robotics company), the peer set would be other publicly traded industrial technology companies of similar scale — not, say, a consumer software company just because both happen to be "tech."</p>
 
     <h3>Step 2 — Gather Each Peer's Current Market Data</h3>
-    <p>For each peer, pull current market data: share price, shares outstanding (to get market cap), total debt, and cash (to bridge to Enterprise Value), plus EBITDA and revenue for the multiples. This is exactly why trading comps are sometimes called "public market comps" — every input is a live, currently-observable market price, not a historical deal term.</p>
+    <p>For each peer, pull current market data: share price, shares outstanding (to get market cap), total debt, and cash (to bridge to Enterprise Value), plus EBITDA, revenue, and net income for the multiples. This is exactly why trading comps are sometimes called "public market comps" — every input is a live, currently-observable market price, not a historical deal term. Multiple metrics are typically calculated side by side, since no single multiple tells the complete story on its own:</p>
     <table class="model-table">
-      <tr><th>Peer</th><th>EV ($M)</th><th>EBITDA ($M)</th><th>EV/EBITDA</th></tr>
-      <tr><td>Peer A</td><td>$950</td><td>$100</td><td>9.5x</td></tr>
-      <tr><td>Peer B</td><td>$1,240</td><td>$122</td><td>10.2x</td></tr>
-      <tr><td>Peer C</td><td>$680</td><td>$76</td><td>8.9x</td></tr>
-      <tr><td>Peer D</td><td>$1,050</td><td>$110</td><td>9.5x</td></tr>
+      <tr><th>Peer</th><th>EV ($M)</th><th>EV/EBITDA</th><th>EV/Revenue</th><th>P/E</th></tr>
+      <tr><td>Peer A</td><td>$950</td><td>9.5x</td><td>1.9x</td><td>18.2x</td></tr>
+      <tr><td>Peer B</td><td>$1,240</td><td>10.2x</td><td>2.1x</td><td>22.5x</td></tr>
+      <tr><td>Peer C</td><td>$680</td><td>8.9x</td><td>1.7x</td><td>16.8x</td></tr>
+      <tr><td>Peer D</td><td>$1,050</td><td>9.5x</td><td>2.0x</td><td>19.4x</td></tr>
+      <tr><td>Peer E (outlier)</td><td>$2,100</td><td>15.8x</td><td>3.4x</td><td>31.0x</td></tr>
     </table>
 
-    <h3>Step 3 — Calculate Summary Statistics</h3>
-    <p>Across the peer set: mean EV/EBITDA ≈ <strong>9.5x</strong>, median ≈ <strong>9.5x</strong>. The median is generally preferred over the mean in practice, since it's less distorted by a single outlier peer trading unusually high or low.</p>
+    <h3>Step 3 — Identify and Handle Outliers Before Calculating Statistics</h3>
+    <p>Peer E's multiples sit meaningfully above the rest of the set — worth investigating <em>why</em> before simply including it in a blended average. If Peer E is genuinely growing faster or carries a structurally higher-margin business model, its premium multiple may be entirely justified and worth excluding from a "core peer" median specifically because it isn't truly comparable to Anchor Robotics' own growth and margin profile. If there's no clear fundamental reason for the premium, it may simply reflect temporary market enthusiasm worth noting but not necessarily following. Either way, mechanically averaging in an unexplained outlier without this judgment step is exactly the kind of superficial comps work that produces a misleading valuation range.</p>
 
-    <h3>Step 4 — Apply the Multiple to the Target</h3>
+    <h3>Step 4 — Calculate Summary Statistics on the Core Peer Set</h3>
+    <p>Excluding Peer E as a genuine outlier, across the remaining four peers: mean EV/EBITDA ≈ <strong>9.5x</strong>, median ≈ <strong>9.5x</strong>. The median is generally preferred over the mean in practice, since it's less distorted by any single remaining peer trading unusually high or low.</p>
+
+    <h3>Step 5 — Apply the Multiple to the Target</h3>
     <p>Apply the peer median multiple to Anchor Robotics' own EBITDA to get an implied valuation — then bridge from Enterprise Value to an implied per-share price the same way as in the DCF build. Try it below:</p>
     ${renderLessonCalcHTML(TRADING_COMPS_CALC, 902)}
+
+    <h3>Step 6 — Build the Football Field: Comparing Multiple Methodologies Side by Side</h3>
+    <p>A "football field" chart presents the valuation range from every method used — trading comps, transaction comps, and DCF — as horizontal bars stacked on the same axis, letting a reader see at a glance where the different methodologies agree or diverge:</p>
+    <table class="model-table">
+      <tr><th>Methodology</th><th>Low</th><th>High</th></tr>
+      <tr><td>Trading Comps (8.9x - 10.2x EBITDA)</td><td>$38</td><td>$44</td></tr>
+      <tr><td>Transaction Comps (11x - 14x EBITDA)</td><td>$47</td><td>$58</td></tr>
+      <tr><td>DCF (8% - 10% WACC)</td><td>$32</td><td>$47</td></tr>
+    </table>
     <p><strong>Why comps and a DCF are used together, not as substitutes.</strong> A DCF says what a company is intrinsically worth based on its own projected cash flows; comps say what the market is currently willing to pay for similar businesses. Real valuation work — in banking, PE, and equity research alike — almost always presents both side by side, since a DCF that wildly disagrees with where real comparable companies trade is a signal worth investigating, not simply overriding with one method or the other.</p>
   </div>
   `;
@@ -7674,16 +7756,19 @@ function transactionCompsBuildHTML(){
     <p>Search for completed M&amp;A transactions involving companies similar to the target in industry, size, and business model — ideally from the past 2-3 years, since older deals may reflect a meaningfully different market and financing environment. For Anchor Robotics, this means finding real, completed acquisitions of other industrial sensor or robotics companies, not simply any technology deal that happens to be recent.</p>
 
     <h3>Step 2 — Calculate Each Deal's Transaction Multiple</h3>
-    <p>For each precedent deal, calculate the Enterprise Value the acquirer actually paid divided by the target's EBITDA (or revenue) at the time of the deal — the transaction multiple.</p>
+    <p>For each precedent deal, calculate the Enterprise Value the acquirer actually paid divided by the target's EBITDA (or revenue) at the time of the deal — the transaction multiple. Note the acquirer type for each deal too, since it directly affects how much was paid:</p>
     <table class="model-table">
-      <tr><th>Deal</th><th>Acquirer</th><th>Deal EV ($M)</th><th>Target EBITDA ($M)</th><th>Multiple</th></tr>
-      <tr><td>Deal 1</td><td>Company X</td><td>$1,100</td><td>$85</td><td>12.9x</td></tr>
-      <tr><td>Deal 2</td><td>Company Y</td><td>$780</td><td>$65</td><td>12.0x</td></tr>
-      <tr><td>Deal 3</td><td>Company Z</td><td>$1,450</td><td>$110</td><td>13.2x</td></tr>
+      <tr><th>Deal</th><th>Acquirer</th><th>Buyer Type</th><th>Deal EV ($M)</th><th>Target EBITDA ($M)</th><th>Multiple</th></tr>
+      <tr><td>Deal 1</td><td>Company X</td><td>Strategic</td><td>$1,100</td><td>$85</td><td>12.9x</td></tr>
+      <tr><td>Deal 2</td><td>Company Y</td><td>Financial (PE)</td><td>$780</td><td>$65</td><td>12.0x</td></tr>
+      <tr><td>Deal 3</td><td>Company Z</td><td>Strategic</td><td>$1,450</td><td>$110</td><td>13.2x</td></tr>
+      <tr><td>Deal 4</td><td>Company W</td><td>Strategic</td><td>$960</td><td>$72</td><td>13.3x</td></tr>
     </table>
+    <p><strong>Why buyer type genuinely affects the multiple paid.</strong> Strategic acquirers (Deals 1, 3, 4) typically pay somewhat higher multiples than financial sponsors (Deal 2), since a strategic buyer can justify a higher price using real, achievable synergies — consistent with the strategic vs. financial buyer distinction covered in the M&amp;A Deal Structures module elsewhere in this curriculum — while a PE sponsor's price is constrained by needing the deal to independently generate an attractive standalone LBO return with no synergy credit. A careful analyst notes this pattern rather than simply averaging all deal types together as if they reflected identical underlying economics.</p>
 
     <h3>Step 3 — Understand Why These Multiples Run Higher Than Trading Comps</h3>
     <p>Precedent transaction multiples are almost always higher than trading comps multiples for genuinely comparable companies, because a real acquirer must pay a <strong>control premium</strong> — extra compensation for the right to control the target's strategy, board, and cash flows outright, something a public market investor buying shares on an exchange never receives. This control premium commonly runs in the range of 20-40% over a target's unaffected trading price, though it varies by deal.</p>
+    <p><strong>Worked example — reconstructing the premium actually embedded in Deal 1.</strong> If Company X's peers were trading at an unaffected 9.5x EV/EBITDA right before the deal was announced, and the deal actually closed at 12.9x, the implied premium = (12.9 ÷ 9.5) − 1 = <strong>36%</strong> — squarely within the typical range, and a useful sanity check that this precedent deal's pricing wasn't a genuine outlier driven by unusual, deal-specific circumstances worth investigating further before including it in the comp set.</p>
 
     <h3>Step 4 — Apply a Transaction Multiple to the Target</h3>
     <p>Starting from a peer's genuine unaffected trading multiple and layering on a realistic control premium reconstructs an appropriate transaction multiple to apply to Anchor Robotics — try it below:</p>
@@ -7701,19 +7786,51 @@ function maBuildHTML(){
 
     <h3>Step 1 — Determine the Purchase Price and Consideration Mix</h3>
     <p>Anchor Robotics (the acquirer) agrees to buy a smaller target for $360M, funded with a mix of $200M in new debt and $160M in newly issued Anchor stock (at Anchor's current $40/share price, that's 4 million new shares issued to the target's shareholders).</p>
+    <table class="model-table">
+      <tr><th>Uses</th><th>$M</th><th>Sources</th><th>$M</th></tr>
+      <tr><td>Purchase of Target Equity</td><td>$360</td><td>New Debt</td><td>$200</td></tr>
+      <tr><td>Transaction Fees</td><td>$8</td><td>New Acquirer Stock Issued</td><td>$160</td></tr>
+      <tr><td></td><td></td><td>Acquirer Cash on Hand</td><td>$8</td></tr>
+      <tr><td><strong>Total Uses</strong></td><td><strong>$368</strong></td><td><strong>Total Sources</strong></td><td><strong>$368</strong></td></tr>
+    </table>
 
-    <h3>Step 2 — Combine the Income Statements and Add Synergies</h3>
-    <p>Sum the acquirer's and target's standalone net income, then add any expected after-tax synergies (cost savings or revenue benefits from combining the businesses) — consistent with the synergy concepts covered in the M&amp;A Deal Structures module elsewhere in this curriculum.</p>
+    <h3>Step 2 — Allocate the Purchase Price and Calculate Goodwill</h3>
+    <p>The purchase price rarely equals the target's existing book value of net assets — the difference gets allocated first to identifiable tangible and intangible assets being written up to fair value (a simplified version of the Purchase Price Allocation process covered in the Advanced M&amp;A Modeling curriculum module), with anything left over recorded as <strong>goodwill</strong> on the combined balance sheet.</p>
+    <table class="model-table">
+      <tr><td>Purchase Price</td><td>$360</td></tr>
+      <tr><td>Less: Target's Existing Net Asset Value</td><td>($120)</td></tr>
+      <tr><td>Less: Fair Value Write-Up (identifiable intangibles)</td><td>($90)</td></tr>
+      <tr><td><strong>= Goodwill</strong></td><td><strong>$150</strong></td></tr>
+    </table>
+    <p>Goodwill sits on the combined balance sheet indefinitely (subject to periodic impairment testing) — it doesn't amortize through the income statement under current accounting rules, which is exactly why it doesn't directly affect the EPS calculation below, unlike the identifiable intangibles write-up, which typically does amortize and does reduce pro forma net income.</p>
 
-    <h3>Step 3 — Adjust for New Financing Costs</h3>
-    <p>The new debt raised to fund the deal carries real interest expense that reduces pro forma net income — a cost purely from how the deal is financed, separate from the target's own operating performance.</p>
+    <h3>Step 3 — Combine the Income Statements and Add Synergies</h3>
+    <p>Sum the acquirer's and target's standalone net income, then add any expected after-tax synergies (cost savings or revenue benefits from combining the businesses) and subtract the new financing costs and incremental intangible amortization created by the deal itself:</p>
+    <table class="model-table">
+      <tr><th></th><th>Acquirer (Standalone)</th><th>Target (Standalone)</th><th>Pro Forma Combined</th></tr>
+      <tr><td>Net Income</td><td>$200</td><td>$30</td><td>$230</td></tr>
+      <tr><td>Plus: After-Tax Synergies</td><td></td><td></td><td>$10</td></tr>
+      <tr><td>Less: New Debt Interest (after-tax)</td><td></td><td></td><td>($9)</td></tr>
+      <tr><td>Less: Incremental Intangible Amortization (after-tax)</td><td></td><td></td><td>($7)</td></tr>
+      <tr><td><strong>Pro Forma Net Income</strong></td><td><strong>$200</strong></td><td><strong>$30</strong></td><td><strong>$224</strong></td></tr>
+    </table>
 
-    <h3>Step 4 — Calculate Pro Forma Shares and EPS</h3>
+    <h3>Step 4 — Adjust for New Financing Costs</h3>
+    <p>The new debt raised to fund the deal carries real interest expense that reduces pro forma net income — a cost purely from how the deal is financed, separate from the target's own operating performance, exactly the after-tax interest line already reflected in the table above.</p>
+
+    <h3>Step 5 — Calculate Pro Forma Shares and EPS</h3>
     <p>Add any newly issued shares to the acquirer's existing share count to get pro forma diluted shares outstanding, then divide pro forma net income by pro forma shares to get pro forma EPS — compare this against the acquirer's standalone EPS to determine accretion or dilution. Try the full calculation below:</p>
     ${renderLessonCalcHTML(MA_CALC, 904)}
+    <table class="model-table">
+      <tr><th></th><th>Acquirer Standalone</th><th>Pro Forma Combined</th></tr>
+      <tr><td>Net Income</td><td>$200</td><td>$224</td></tr>
+      <tr><td>Diluted Shares</td><td>100</td><td>104</td></tr>
+      <tr><td><strong>EPS</strong></td><td><strong>$2.00</strong></td><td><strong>$2.15</strong></td></tr>
+      <tr><td><strong>Accretion / (Dilution)</strong></td><td></td><td><strong>+7.7%</strong></td></tr>
+    </table>
 
-    <h3>Step 5 — Sanity-Check the Result Against the Deal's Economics</h3>
-    <p>A quick rule of thumb: an all-stock deal is typically dilutive if the acquirer's P/E is higher than the target's (issuing "expensive" shares to buy "cheap" earnings dilutes the combined P/E), and accretive if the reverse is true — a genuine sanity check worth running before trusting the full model's output, consistent with the P/E-shortcut method covered in the M&amp;A Deal Structures module elsewhere in this curriculum.</p>
+    <h3>Step 6 — Sanity-Check the Result Against the Deal's Economics</h3>
+    <p>A quick rule of thumb: an all-stock deal is typically dilutive if the acquirer's P/E is higher than the target's (issuing "expensive" shares to buy "cheap" earnings dilutes the combined P/E), and accretive if the reverse is true — a genuine sanity check worth running before trusting the full model's output, consistent with the P/E-shortcut method covered in the M&amp;A Deal Structures module elsewhere in this curriculum. Here, Anchor trades at a lower P/E than what it's effectively paying for the target's earnings, which is exactly why this particular deal, even with real new financing costs and amortization dragging on pro forma net income, still nets out accretive.</p>
   </div>
   `;
 }
