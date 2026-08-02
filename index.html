@@ -681,6 +681,9 @@
       <label for="passInput">Password</label>
       <input id="passInput" type="password" placeholder="At least 6 characters" autocomplete="current-password">
     </div>
+    <div id="forgotPasswordRow" style="text-align:right; margin:-6px 0 14px;">
+      <button class="legal-link" id="forgotPasswordBtn" style="font-size:12.5px;">Forgot password?</button>
+    </div>
     <div id="authStatus" class="auth-status"></div>
     <button class="login-btn" id="loginBtn">Log in</button>
 
@@ -691,6 +694,20 @@
     <div class="login-legal">
       By continuing you agree to the <button class="legal-link" id="showTermsBtn">Terms of Service</button> and <button class="legal-link" id="showPrivacyBtn">Privacy Policy</button>.
     </div>
+  </div>
+</div>
+
+<!-- ===================== RESET PASSWORD (shown after clicking the emailed reset link) ===================== -->
+<div id="resetPasswordView" class="hidden">
+  <div class="login-card">
+    <div class="login-logo">FinanceIQ <span>$IQ</span></div>
+    <div class="login-sub">Set a new password for your account.</div>
+    <div class="field">
+      <label for="newPassInput">New Password</label>
+      <input id="newPassInput" type="password" placeholder="At least 6 characters" autocomplete="new-password">
+    </div>
+    <div id="resetPasswordStatus" class="auth-status"></div>
+    <button class="login-btn" id="updatePasswordBtn">Update Password</button>
   </div>
 </div>
 
@@ -769,6 +786,15 @@
 const SUPABASE_URL = 'https://mnqtozvglnoccxxoforx.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_Pcz0bVmyYUoGbThj-1U3zQ_aom3LukS';
 const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// When a user clicks the "reset password" link from their email, Supabase redirects them
+// back here and fires this event — show the dedicated reset-password screen instead of login.
+supa.auth.onAuthStateChange((event, session) => {
+  if(event === 'PASSWORD_RECOVERY'){
+    $('#loginView').classList.add('hidden');
+    $('#resetPasswordView').classList.remove('hidden');
+  }
+});
 
 // Maps the old key-prefix scheme to real table/column operations, so the rest
 // of the app can keep calling db.get/set/list with almost no changes elsewhere.
@@ -5367,6 +5393,7 @@ $('#toggleModeBtn').addEventListener('click', ()=>{
   $('#loginBtn').textContent = mode === 'login' ? 'Log in' : 'Create account';
   $('#loginSub').textContent = mode === 'login' ? 'Log in to pick up where you left off.' : 'Set up your account to start tracking progress.';
   $('#nameField').style.display = mode === 'signup' ? 'block' : 'none';
+  $('#forgotPasswordRow').style.display = mode === 'signup' ? 'none' : 'block';
   setAuthStatus('', '');
 });
 
@@ -5493,6 +5520,48 @@ $('#loginBtn').addEventListener('click', async ()=>{
     }
     await enterApp(email);
   }
+});
+
+$('#forgotPasswordBtn').addEventListener('click', async ()=>{
+  const email = $('#emailInput').value.trim();
+  if(!email){ setAuthStatus('Enter your email above first, then click "Forgot password?" again.', 'error'); return; }
+  $('#forgotPasswordBtn').disabled = true;
+  setAuthStatus('Sending reset link...', 'info');
+  const { error } = await supa.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + window.location.pathname
+  });
+  $('#forgotPasswordBtn').disabled = false;
+  if(error){ setAuthStatus(error.message, 'error'); return; }
+  setAuthStatus('Check your email for a link to reset your password.', 'success');
+});
+
+$('#updatePasswordBtn').addEventListener('click', async ()=>{
+  const newPassword = $('#newPassInput').value;
+  const statusEl = $('#resetPasswordStatus');
+  if(!newPassword || newPassword.length < 6){
+    statusEl.textContent = 'Password must be at least 6 characters.';
+    statusEl.className = 'auth-status error';
+    return;
+  }
+  $('#updatePasswordBtn').disabled = true;
+  statusEl.textContent = 'Updating password...';
+  statusEl.className = 'auth-status info';
+  const { error } = await supa.auth.updateUser({ password: newPassword });
+  $('#updatePasswordBtn').disabled = false;
+  if(error){
+    statusEl.textContent = error.message;
+    statusEl.className = 'auth-status error';
+    return;
+  }
+  statusEl.textContent = 'Password updated! Redirecting you to log in...';
+  statusEl.className = 'auth-status success';
+  setTimeout(async ()=>{
+    await supa.auth.signOut();
+    $('#resetPasswordView').classList.add('hidden');
+    $('#loginView').classList.remove('hidden');
+    $('#newPassInput').value = '';
+    setAuthStatus('Password updated — log in with your new password.', 'success');
+  }, 1500);
 });
 
 // Public credential verification route — no login required, so recruiters/employers clicking
