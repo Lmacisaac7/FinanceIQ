@@ -6792,7 +6792,7 @@ Rules:
 
   try{
     const apiMessages = st.messages.map(m => ({ role: m.role === 'bot' ? 'assistant' : 'user', content: m.text }));
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -6894,7 +6894,7 @@ async function sendTutorMessage(text){
 
   try{
     const apiMessages = tutorMessages.map(m => ({ role: m.role === 'bot' ? 'assistant' : 'user', content: m.text }));
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -6967,7 +6967,7 @@ async function sendBotMessage(text){
       .filter(m => true)
       .map(m => ({ role: m.role === 'bot' ? 'assistant' : 'user', content: m.rawText || m.text }));
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -7197,7 +7197,7 @@ async function sendMockMessage(text){
 
   try{
     const apiMessages = mockBotMessages.map(m => ({ role: m.role === 'bot' ? 'assistant' : 'user', content: m.text }));
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -7432,7 +7432,7 @@ async function sendResumeMessage(text){
   renderResumeMessages();
   try{
     const apiMessages = resumeBotMessages.map(m => ({ role: m.role === 'bot' ? 'assistant' : 'user', content: m.text }));
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -7462,7 +7462,7 @@ async function sendNetworkingMessage(text){
   renderNetworkingMessages();
   try{
     const apiMessages = networkingBotMessages.map(m => ({ role: m.role === 'bot' ? 'assistant' : 'user', content: m.text }));
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
