@@ -720,7 +720,6 @@
       <div class="tb-logo">FinanceIQ <span>$IQ</span></div>
       <div class="tb-nav">
         <button class="active" id="navDashboard">Dashboard</button>
-        <button id="navTutor">AI Tutor</button>
         <button id="navInterview">Interview &amp; Networking Prep</button>
         <button id="navCert">Certification</button>
         <button id="navModeling">Financial Modeling</button>
@@ -5824,7 +5823,6 @@ document.querySelectorAll('.tb-nav button').forEach(btn=>{
   btn.addEventListener('click', ()=>{ $('.tb-nav').classList.remove('mobile-open'); });
 });
 $('#navModeling').addEventListener('click', ()=>{ view = {screen:'modeling'}; render(); });
-$('#navTutor').addEventListener('click', ()=>{ view = {screen:'tutor'}; render(); });
 $('#navInterview').addEventListener('click', ()=>{ view = {screen:'interview'}; render(); });
 $('#navCert').addEventListener('click', ()=>{ view = {screen:'credentials'}; render(); });
 $('#navRefer').addEventListener('click', ()=>{ view = {screen:'refer'}; render(); });
@@ -5884,7 +5882,6 @@ function render(){
   else if(view.screen === 'onboarding'){ renderOnboarding(); }
   else if(view.screen === 'track'){ renderTrack(); }
   else if(view.screen === 'lesson'){ renderLesson(); }
-  else if(view.screen === 'tutor'){ $('#navTutor').classList.add('active'); renderTutor(); }
   else if(view.screen === 'interview'){ $('#navInterview').classList.add('active'); renderInterview(); }
   else if(view.screen === 'refer'){ $('#navRefer').classList.add('active'); renderRefer(); }
   else if(view.screen === 'certificate'){ renderCertificate(); }
@@ -6274,27 +6271,6 @@ function renderTrack(){
         </div>
       `).join('')}
     </div>
-    <div class="dt-section-title">Strategy Assistant</div>
-    <div class="bot-panel">
-      <div class="bot-header">
-        <div class="bot-avatar">IQ</div>
-        <div>
-          <h3>Day Trading Strategy Assistant</h3>
-          <p>EDUCATIONAL · NO LIVE MARKET DATA · NOT FINANCIAL ADVICE</p>
-        </div>
-      </div>
-      <div class="bot-messages" id="botMessages"></div>
-      <div class="bot-suggestions" id="botSuggestions">
-        <button class="bot-chip" data-q="Explain breakout trading like I'm brand new to it">What's breakout trading?</button>
-        <button class="bot-chip" data-q="How should I think about position sizing and risk per trade as a beginner day trader?">Position sizing basics</button>
-        <button class="bot-chip" data-q="What are the most common mistakes new day traders make?">Common beginner mistakes</button>
-        <button class="bot-chip" data-q="Walk me through how VWAP mean-reversion trades are typically set up">Explain VWAP mean-reversion</button>
-      </div>
-      <div class="bot-input-row">
-        <input type="text" id="botInput" placeholder="Ask about a strategy, risk rule, or setup...">
-        <button class="bot-send" id="botSendBtn">Send</button>
-      </div>
-    </div>
     ` : ''}
     ${track.id === 't7' ? `
     <div class="dt-section-title" style="margin-top:34px;">Careers in Finance quiz</div>
@@ -6397,22 +6373,6 @@ function renderTrack(){
       renderTrack();
     });
   });
-  if(track.id === 't5'){
-    renderBotMessages();
-    document.querySelectorAll('#botSuggestions .bot-chip').forEach(chip=>{
-      chip.addEventListener('click', ()=> sendBotMessage(chip.dataset.q));
-    });
-    $('#botSendBtn').addEventListener('click', ()=>{
-      const val = $('#botInput').value.trim();
-      if(val) sendBotMessage(val);
-    });
-    $('#botInput').addEventListener('keydown', (e)=>{
-      if(e.key === 'Enter'){
-        const val = $('#botInput').value.trim();
-        if(val) sendBotMessage(val);
-      }
-    });
-  }
   if(track.id === 't7'){
     wireCareerQuizEvents();
   }
@@ -6668,29 +6628,6 @@ function renderLesson(){
       ${lesson.calc ? renderLessonCalcHTML(lesson.calc) : ''}
 
       <button class="complete-btn ${isDone ? 'done' : ''}" id="completeBtn">${isDone ? '✓ Completed' : 'Mark complete & continue'}</button>
-
-      <div class="lesson-tutor-wrap">
-        <div class="dt-section-title">Ask about this lesson</div>
-        <div class="bot-panel">
-          <div class="bot-header">
-            <div class="bot-avatar">IQ</div>
-            <div>
-              <h3>Lesson Tutor</h3>
-              <p>GROUNDED IN "${lesson.title.toUpperCase()}" · AI-GENERATED</p>
-            </div>
-          </div>
-          <div class="bot-messages small" id="lessonTutorMessages"></div>
-          <div class="bot-suggestions" id="lessonTutorSuggestions">
-            <button class="bot-chip" data-q="Can you explain this in a simpler way, with a different example?">Explain it more simply</button>
-            <button class="bot-chip" data-q="Why does this actually matter in a real job, not just for the quiz?">Why does this matter on the job?</button>
-            <button class="bot-chip" data-q="Quiz me with one more practice question on this lesson, different from the checkpoint above.">Give me one more practice question</button>
-          </div>
-          <div class="bot-input-row">
-            <input type="text" id="lessonTutorInput" placeholder="Ask anything about this lesson...">
-            <button class="bot-send" id="lessonTutorSendBtn">Send</button>
-          </div>
-        </div>
-      </div>
     </div>
   `;
   $('#backToTrack').addEventListener('click', ()=>{ view={screen:'track', trackId:track.id}; render(); });
@@ -6721,200 +6658,8 @@ function renderLesson(){
     }
     render();
   });
-
-  initLessonTutor(key, lesson.title);
-  renderLessonTutorMessages();
-  document.querySelectorAll('#lessonTutorSuggestions .bot-chip').forEach(chip=>{
-    chip.addEventListener('click', ()=> sendLessonTutorMessage(track, lesson, key, chip.dataset.q));
-  });
-  $('#lessonTutorSendBtn').addEventListener('click', ()=>{
-    const val = $('#lessonTutorInput').value.trim();
-    if(val) sendLessonTutorMessage(track, lesson, key, val);
-  });
-  $('#lessonTutorInput').addEventListener('keydown', (e)=>{
-    if(e.key === 'Enter'){
-      const val = $('#lessonTutorInput').value.trim();
-      if(val) sendLessonTutorMessage(track, lesson, key, val);
-    }
-  });
 }
 
-// ---------- LESSON-EMBEDDED AI TUTOR ----------
-let lessonTutorState = {}; // lessonKey -> { messages: [], busy: false }
-let activeLessonTutorKey = null;
-
-function initLessonTutor(key, title){
-  activeLessonTutorKey = key;
-  if(!lessonTutorState[key]){
-    lessonTutorState[key] = {
-      messages: [{ role:'bot', text: `Ask me anything about "${escapeHtml(title)}" — a term that didn't click, a request for a different example, or a harder practice question.` }],
-      busy: false
-    };
-  }
-}
-
-function renderLessonTutorMessages(){
-  const box = $('#lessonTutorMessages');
-  if(!box || !activeLessonTutorKey) return;
-  const st = lessonTutorState[activeLessonTutorKey];
-  box.innerHTML = st.messages.map(m => `<div class="bmsg ${m.role === 'bot' ? 'bot' : 'user'}">${m.text}</div>`).join('')
-    + (st.busy ? `<div class="bmsg bot typing">Thinking…</div>` : '');
-  box.scrollTop = box.scrollHeight;
-}
-
-function plainText(html){
-  const div = document.createElement('div');
-  div.innerHTML = html;
-  return div.textContent || div.innerText || '';
-}
-
-async function sendLessonTutorMessage(track, lesson, key, text){
-  const st = lessonTutorState[key];
-  if(!st || st.busy) return;
-  st.messages.push({ role:'user', text: escapeHtml(text) });
-  if($('#lessonTutorInput')) $('#lessonTutorInput').value = '';
-  st.busy = true;
-  renderLessonTutorMessages();
-
-  const systemPrompt = `You are the FinanceIQ Lesson Tutor, an educational feature inside a finance-learning app. The student is currently on this lesson:
-
-Track: ${track.title}
-Lesson: "${lesson.title}"
-Lesson content: """${plainText(lesson.body)}"""
-Checkpoint question for this lesson: "${lesson.quiz.q}"
-
-Rules:
-- Ground your answers in the lesson content above whenever the question relates to it — extend and clarify it, don't contradict it.
-- If asked for a new practice question, write ONE new question (with a brief model answer) that's different from the checkpoint question above, at a similar difficulty.
-- If asked something unrelated to this lesson or to finance/accounting/markets generally, you can still help, but gently note it's outside this lesson's scope.
-- Never give a live buy/sell recommendation on a real security, and never claim to have real-time market data.
-- Keep answers concise and conversational — a student is reading this mid-lesson, not receiving a report.`;
-
-  try{
-    const apiMessages = st.messages.map(m => ({ role: m.role === 'bot' ? 'assistant' : 'user', content: m.text }));
-    const response = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
-        system: systemPrompt,
-        messages: apiMessages
-      })
-    });
-    const data = await response.json();
-    const textBlocks = (data.content || []).filter(c => c.type === 'text').map(c => c.text);
-    const reply = textBlocks.join('\n\n') || "I wasn't able to generate a response that time — try rephrasing.";
-    st.messages.push({ role:'bot', text: escapeHtml(reply).replace(/\n/g,'<br>') });
-  }catch(e){
-    st.messages.push({ role:'bot', text: "I couldn't reach the tutor just now. Try again in a moment." });
-  }finally{
-    st.busy = false;
-    renderLessonTutorMessages();
-  }
-}
-
-// ---------- GENERAL AI TUTOR HUB ----------
-let tutorMessages = [
-  { role:'bot', text:`I'm the FinanceIQ AI Tutor — ask me about anything across all 20 modules: time value of money, the 9 core tracks (accounting, valuation, markets, trading, wealth management, real estate, FP&A, or careers), plus extension modules like M&A structuring, private equity, and wealth management practice. I can also help you decide what to study next based on where you're stuck.` }
-];
-let tutorBusy = false;
-
-function renderTutor(){
-  mainArea.innerHTML = `
-    <div class="dash-head">
-      <div>
-        <h1>AI Tutor</h1>
-        <p>One place to ask anything, across every track.</p>
-      </div>
-    </div>
-    <div class="tutor-intro">
-      <p>This tutor isn't limited to one lesson — ask it to compare concepts across tracks, explain something you read in the news, or help you figure out what to study next. It still won't give live trade signals or personalized financial advice — see the Day Trading Lab, the Mock Interview Bot, the Resume &amp; LinkedIn Coach, and the Networking Prep Coach in Interview &amp; Networking Prep for those focused use cases.</p>
-    </div>
-    <div class="bot-panel" style="max-width:760px;">
-      <div class="bot-header">
-        <div class="bot-avatar">IQ</div>
-        <div>
-          <h3>FinanceIQ AI Tutor</h3>
-          <p>ALL TRACKS · AI-GENERATED · NOT FINANCIAL ADVICE</p>
-        </div>
-      </div>
-      <div class="bot-messages" id="tutorMessages"></div>
-      <div class="bot-suggestions" id="tutorSuggestions">
-        <button class="bot-chip" data-q="What's the difference between EV/EBITDA and P/E, and when would I use each?">EV/EBITDA vs. P/E?</button>
-        <button class="bot-chip" data-q="I keep mixing up cash flow from operations and free cash flow. Can you clear that up?">CFO vs. free cash flow</button>
-        <button class="bot-chip" data-q="Based on someone who likes markets more than deal-making, what track should I focus on next?">What should I study next?</button>
-      </div>
-      <div class="bot-input-row">
-        <input type="text" id="tutorInput" placeholder="Ask about any concept, across any track...">
-        <button class="bot-send" id="tutorSendBtn">Send</button>
-      </div>
-    </div>
-  `;
-  renderTutorMessages();
-  document.querySelectorAll('#tutorSuggestions .bot-chip').forEach(chip=>{
-    chip.addEventListener('click', ()=> sendTutorMessage(chip.dataset.q));
-  });
-  $('#tutorSendBtn').addEventListener('click', ()=>{
-    const val = $('#tutorInput').value.trim();
-    if(val) sendTutorMessage(val);
-  });
-  $('#tutorInput').addEventListener('keydown', (e)=>{
-    if(e.key === 'Enter'){
-      const val = $('#tutorInput').value.trim();
-      if(val) sendTutorMessage(val);
-    }
-  });
-}
-
-function renderTutorMessages(){
-  const box = $('#tutorMessages');
-  if(!box) return;
-  box.innerHTML = tutorMessages.map(m => `<div class="bmsg ${m.role === 'bot' ? 'bot' : 'user'}">${m.text}</div>`).join('')
-    + (tutorBusy ? `<div class="bmsg bot typing">Thinking…</div>` : '');
-  box.scrollTop = box.scrollHeight;
-}
-
-const TUTOR_SYSTEM_PROMPT = `You are the FinanceIQ AI Tutor, an educational feature inside a finance-learning app covering 20 modules total: a Time Value of Money & Corporate Finance Fundamentals module (PV/FV, NPV/IRR, annuities and perpetuities, effective vs. nominal rates), nine core tracks (Accounting Foundations, Financial Statement Analysis, Valuation & Modeling, Stock Market & Investing, Trading & Technical Analysis, Wealth & Personal Finance, Real Estate Finance & Investing, Financial Planning & Analysis (FP&A), and Careers in Finance), and ten extension modules covering Purchase Price Allocation, Interpreting Non-GAAP Reports, the Private Equity Deal Process, Private Equity Fund Structure & Economics, Comparable Company & Precedent Transaction Analysis, Investment Banking Career & Compensation, Wealth Management Industry & Practice, Diluted Shares & EPS, Financial Accounting, and Managerial Accounting.
-
-Rules:
-- Answer questions across any of these areas clearly and at a level appropriate for someone learning, not already expert.
-- You can help a student figure out what to study next based on what they say they enjoy or struggle with, pointing to specific tracks.
-- If asked about networking, cold outreach, coffee chats, informational interviews, or landing an internship/full-time offer, you can answer directly using this app's approach (short, specific, one small ask; coffee chats are in-person/informal, informational interviews are video/phone and more structured; follow up within 24 hours referencing something specific) — but for drafting or critiquing an actual message, or prepping specific coffee chat questions, point the user to the Networking Prep Coach in Interview & Networking Prep, which is built for exactly that.
-- Never give a live buy/sell recommendation on a real, named security, never predict short-term price moves, and never claim to have real-time market data.
-- Nothing you say is personalized financial, investment, tax, or legal advice — you can note this naturally when relevant without repeating it in every message.
-- Keep answers concise and conversational.`;
-
-async function sendTutorMessage(text){
-  if(tutorBusy) return;
-  tutorMessages.push({ role:'user', text: escapeHtml(text) });
-  $('#tutorInput').value = '';
-  tutorBusy = true;
-  renderTutorMessages();
-
-  try{
-    const apiMessages = tutorMessages.map(m => ({ role: m.role === 'bot' ? 'assistant' : 'user', content: m.text }));
-    const response = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
-        system: TUTOR_SYSTEM_PROMPT,
-        messages: apiMessages
-      })
-    });
-    const data = await response.json();
-    const textBlocks = (data.content || []).filter(c => c.type === 'text').map(c => c.text);
-    const reply = textBlocks.join('\n\n') || "I wasn't able to generate a response that time — try rephrasing.";
-    tutorMessages.push({ role:'bot', text: escapeHtml(reply).replace(/\n/g,'<br>') });
-  }catch(e){
-    tutorMessages.push({ role:'bot', text: "I couldn't reach the tutor just now. Try again in a moment." });
-  }finally{
-    tutorBusy = false;
-    renderTutorMessages();
-  }
-}
 
 // ---------- DAY TRADING LAB ----------
 const STRATEGIES = [
@@ -6929,65 +6674,6 @@ const STRATEGIES = [
   { num:'05', name:'Scalping', desc:'Takes many small, fast trades to capture tiny price movements, relying on high win-rate and tight risk control rather than any single big move.',
     timeframe:'Tick / 1-min charts', risk:'Transaction costs matter — needs a real edge' },
 ];
-
-let botMessages = [
-  { role:'bot', text:`I'm the FinanceIQ Day Trading Strategy Assistant. I can walk you through strategy frameworks, entry/exit logic, and risk management — think of me as a study partner, not a signal service. I don't have live market data and I won't tell you what to buy right now. What do you want to work through?` }
-];
-let botBusy = false;
-
-function renderBotMessages(){
-  const box = $('#botMessages');
-  if(!box) return;
-  box.innerHTML = botMessages.map(m => `<div class="bmsg ${m.role === 'bot' ? 'bot' : 'user'}">${m.text}</div>`).join('')
-    + (botBusy ? `<div class="bmsg bot typing">Thinking…</div>` : '');
-  box.scrollTop = box.scrollHeight;
-}
-
-const BOT_SYSTEM_PROMPT = `You are the FinanceIQ Day Trading Strategy Assistant, an educational feature inside a finance-learning app.
-
-Rules you always follow:
-- You have no access to real-time market data. Never claim otherwise.
-- Never recommend buying, selling, or holding any specific, named, real security, and never predict short-term price direction for a real ticker.
-- Never give an instruction to place a trade "right now." You explain frameworks and let the user apply them.
-- Explain day trading strategies (breakout, momentum, VWAP mean-reversion, gap-and-go, scalping, etc.) conceptually: typical setup criteria, entry/exit logic, and risk management (position sizing, stop placement, max daily loss rules).
-- Proactively reinforce risk management and realistic expectations — most active day traders underperform buy-and-hold over time, and leverage/margin can amplify losses beyond the initial deposit.
-- If asked for a live signal, a specific stock pick, or a guarantee of profit, decline briefly and redirect to the underlying strategy framework and risk principles instead.
-- Keep answers focused and practical — a few short paragraphs or a tight list, not an essay.
-- You are not a licensed financial advisor and nothing you say is personalized financial advice; you can say this naturally without repeating it in every single message.`;
-
-async function sendBotMessage(text){
-  if(botBusy) return;
-  botMessages.push({ role:'user', text: escapeHtml(text) });
-  $('#botInput').value = '';
-  botBusy = true;
-  renderBotMessages();
-
-  try{
-    const apiMessages = botMessages
-      .filter(m => true)
-      .map(m => ({ role: m.role === 'bot' ? 'assistant' : 'user', content: m.rawText || m.text }));
-
-    const response = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
-        system: BOT_SYSTEM_PROMPT,
-        messages: apiMessages
-      })
-    });
-    const data = await response.json();
-    const textBlocks = (data.content || []).filter(c => c.type === 'text').map(c => c.text);
-    const reply = textBlocks.join('\n\n') || "I wasn't able to generate a response that time — try rephrasing your question.";
-    botMessages.push({ role:'bot', text: escapeHtml(reply).replace(/\n/g,'<br>') });
-  }catch(e){
-    botMessages.push({ role:'bot', text: "I couldn't reach the strategy assistant just now. Try again in a moment." });
-  }finally{
-    botBusy = false;
-    renderBotMessages();
-  }
-}
 
 function escapeHtml(str){
   const div = document.createElement('div');
@@ -7007,12 +6693,48 @@ const QBANK = [
   { cat:'Behavioral', q:'Why this firm, why this role?', a:'Avoid generic praise. Structure: something specific about the firm\'s actual work you can speak to, a concrete connection to your own experience that makes this a logical next step, and what you specifically want to learn or contribute here.' },
   { cat:'Behavioral', q:'Tell me about a time you disagreed with a decision at work or in a group project.', a:'Use a real, specific example. Structure with STAR (Situation, Task, Action, Result), but weight most of the answer on the Action — what you specifically said or did, not just "we talked it out."' },
   { cat:'Behavioral', q:'Walk me through your resume.', a:'This is a request for a 90-second narrative, not a recitation. Pick a through-line and use each experience as a beat in that story, showing why you\'re a coherent, logical fit for this room.' },
+  { cat:'IB / Corp Finance', q:'Walk me through an LBO.', a:'A sponsor buys a company using a mix of debt and equity (often 60-70% debt), the company pays down that debt using its own cash flow over a 4-6 year hold, and the sponsor exits by selling the business — hopefully at a similar or higher multiple than they paid. Returns come from three sources: EBITDA growth, debt paydown, and multiple expansion.' },
+  { cat:'IB / Corp Finance', q:'What makes a good LBO candidate?', a:'Strong, stable, predictable cash flow (to service debt), a leadership position or defensible moat, limited ongoing capex needs, and room for operational improvement. Businesses with lumpy or unpredictable cash flow are genuinely hard to lever up safely.' },
+  { cat:'IB / Corp Finance', q:'Why would a company choose debt over equity financing?', a:'Debt is cheaper (interest is tax-deductible, and debt holders take less risk than equity holders so demand a lower return) and doesn\'t dilute existing shareholders. The tradeoff is real financial risk — fixed interest and principal obligations regardless of how the business performs.' },
+  { cat:'IB / Corp Finance', q:'What\'s the difference between enterprise value and equity value?', a:'Enterprise value is the value of the entire operating business, capital-structure-neutral — what it would cost to buy the whole company debt-and-cash-included. Equity value is just the value of the shares. EV = Equity Value + Debt − Cash (plus preferred stock and minority interest, if any).' },
+  { cat:'IB / Corp Finance', q:'Walk me through a merger model at a high level.', a:'Combine the acquirer and target\'s income statements, add expected synergies, subtract new financing costs (interest on new debt, or dilution from new shares issued), calculate pro forma EPS, and compare it to the acquirer\'s standalone EPS to determine if the deal is accretive or dilutive.' },
+  { cat:'IB / Corp Finance', q:'Why might a deal be accretive even if it\'s a bad strategic decision?', a:'Accretion/dilution is a purely mechanical EPS calculation — it says nothing about whether the deal is strategically sound, whether synergies are realistic, or whether the price paid was fair. A low-quality target bought cheap can still be mathematically accretive.' },
+  { cat:'IB / Corp Finance', q:'What is a leveraged recapitalization?', a:'A company (often already owned by a PE sponsor) takes on new debt specifically to pay a large dividend back to its equity holders, rather than to fund growth or an acquisition — effectively returning capital to shareholders while increasing leverage.' },
+  { cat:'Markets', q:'What happens to bond prices when interest rates rise?', a:'They fall. A bond\'s fixed coupon becomes less attractive relative to newly issued bonds paying the higher current rate, so its price must drop to offer a competitive yield to a new buyer.' },
+  { cat:'Markets', q:'What is duration, in plain terms?', a:'A measure of how sensitive a bond\'s price is to a change in interest rates, expressed roughly in years. Higher duration means more price sensitivity — a 10-year duration bond will move roughly twice as much as a 5-year duration bond for the same rate change.' },
+  { cat:'Markets', q:'Why do growth stocks tend to underperform when interest rates rise?', a:'Growth stocks derive more of their value from cash flows far in the future. Higher discount rates reduce the present value of distant cash flows more than near-term ones, so growth stocks — which are more back-loaded — take a bigger relative hit than value stocks.' },
+  { cat:'Markets', q:'What\'s the difference between a call option and a put option?', a:'A call gives the holder the right to buy an asset at a fixed strike price; a put gives the right to sell. Call buyers profit if the price rises above the strike; put buyers profit if it falls below.' },
+  { cat:'Markets', q:'What is the yield curve, and what does an inverted curve typically signal?', a:'The yield curve plots interest rates across different maturities. Normally, longer maturities carry higher yields (more time risk). An inverted curve — short-term rates higher than long-term — has historically been a fairly reliable, though imperfect, recession signal.' },
+  { cat:'Accounting', q:'Walk me through the three financial statements and how they connect.', a:'Net income from the income statement flows into retained earnings on the balance sheet and is the starting point of the cash flow statement. The cash flow statement\'s ending cash balance flows onto the balance sheet. Changes in balance sheet working capital accounts flow back through the cash flow statement — the three are fully interlinked.' },
+  { cat:'Accounting', q:'What\'s the difference between accrual accounting and cash accounting?', a:'Accrual accounting recognizes revenue and expenses when they\'re earned or incurred, regardless of when cash actually changes hands. Cash accounting only records transactions when cash moves. GAAP requires accrual accounting for most companies.' },
+  { cat:'Accounting', q:'What\'s the difference between gross margin and EBITDA margin?', a:'Gross margin is revenue minus cost of goods sold, divided by revenue — it isolates production/direct cost efficiency. EBITDA margin also subtracts operating expenses (SG&A) but adds back non-cash items like depreciation and amortization, giving a broader view of operating profitability before capital structure and accounting choices.' },
+  { cat:'Accounting', q:'Why does goodwill not get amortized under current accounting rules?', a:'Goodwill is tested annually for impairment instead of amortized on a schedule, since it\'s meant to represent value (like brand, workforce, synergies) that doesn\'t necessarily decline predictably over time the way a depreciating physical asset does. If its value genuinely declines, it gets written down through an impairment charge instead.' },
+  { cat:'Accounting', q:'What is working capital, and why does it matter in a deal?', a:'Working capital is current assets minus current liabilities — cash tied up in the day-to-day operating cycle (receivables, inventory, minus payables). In M&A, buyers and sellers negotiate a working capital "peg" and true-up the final price if actual working capital at closing differs from what was assumed at signing.' },
+  { cat:'Behavioral', q:'Tell me about a time you disagreed with someone on a team.', a:'Use STAR: set up the specific situation, explain the disagreement\'s substance (not just that it happened), describe the concrete action you took to resolve it professionally, and end with a real result — ideally one showing you can disagree respectfully without derailing the team.' },
+  { cat:'Behavioral', q:'Why investment banking?', a:'A strong answer is specific, not generic — tie it to something concrete (a real experience, a genuine skill you want to build, a real reason this path over alternatives) rather than reciting "fast-paced environment" and "steep learning curve," phrases every interviewer has heard hundreds of times.' },
+  { cat:'Behavioral', q:'What\'s a weakness of yours?', a:'Name something genuinely true but not disqualifying, then describe a concrete step you\'re actively taking to address it. Avoid the classic trap of disguising a strength as a fake weakness ("I work too hard") — interviewers have heard that exact answer constantly and it signals a lack of real self-reflection.' },
+  { cat:'Behavioral', q:'Tell me about a time you failed.', a:'Pick a genuine failure, not a thinly-veiled success story. Own your actual role in what went wrong, and focus more time on what you specifically changed afterward than on the failure itself — that\'s what the question is actually trying to assess.' },
+  { cat:'Private Equity', q:'How does a PE fund actually make money?', a:'Two ways: management fees (typically around 2% of committed capital annually, covering fund operations) and carried interest (typically 20% of profits above a preferred return hurdle, once LPs have received their capital back plus that hurdle return).' },
+  { cat:'Private Equity', q:'What\'s the difference between a strategic buyer and a financial buyer?', a:'A strategic buyer is an operating company acquiring for business reasons — synergies, market entry, eliminating a competitor — and can often justify paying more because of those synergies. A financial buyer (a PE fund) buys purely for investment return, with no operating synergies to lean on, so the price must work on a standalone basis.' },
+  { cat:'Private Equity', q:'What is a management rollover, and why do sponsors want it?', a:'Existing management reinvests part of their sale proceeds into the new deal instead of taking it all in cash. Sponsors want this because it directly aligns management\'s financial outcome with the deal\'s performance — and a management team unwilling to roll over meaningfully is itself a signal worth investigating.' },
+  { cat:'Trading', q:'What\'s the difference between a market order and a limit order?', a:'A market order guarantees execution immediately but not a specific price. A limit order guarantees a price (or better) but not execution — if the market never reaches your limit, the order simply never fills.' },
+  { cat:'Trading', q:'How would you explain implied volatility to someone new to options?', a:'It\'s the market\'s expectation of how much a stock is likely to move before an option expires, baked directly into the option\'s price. Higher implied volatility makes both calls and puts more expensive, since a bigger expected move raises the odds the option finishes valuable in either direction.' },
 ];
 let interviewFilter = 'All';
-let mockBotMessages = [
-  { role:'bot', text:`I'll act as your mock interviewer or your coach — you choose. Ask me for a technical question, a behavioral question, or paste an answer you've drafted and I'll critique it against what interviewers actually look for.` }
+const RESUME_TIPS = [
+  { num:'01', name:'Format & Structure', desc:'One page. Reverse-chronological. Consistent bullet formatting. No photo, no objective statement — lead straight into experience.' },
+  { num:'02', name:'Quantify Every Bullet', desc:'"Built a 3-statement model used in a $12M budget decision" beats "Responsible for financial modeling." A number or a concrete outcome makes a claim checkable.' },
+  { num:'03', name:'LinkedIn Headline & Summary', desc:'Headline should say what you do and for whom, not just a job title. Summary should read like the "walk me through your resume" answer — one clear through-line.' },
+  { num:'04', name:'Tailor Per Role', desc:'IB resumes lead with modeling/deal reps. Wealth management resumes lead with client-facing and relationship metrics. Same person, different lead bullets, depending on the target.' },
+  { num:'05', name:'Common Mistakes', desc:'Responsibilities instead of outcomes, generic objective statements, inconsistent tense, and a LinkedIn photo that doesn\'t match the resume\'s professionalism.' },
 ];
-let mockBotBusy = false;
+const NETWORKING_TIPS = [
+  { num:'01', name:'The Small Ask', desc:'Never ask a stranger for a job in the first message. Ask for 15-20 minutes of their perspective — a request almost anyone reasonable can say yes to without much thought.' },
+  { num:'02', name:'Coffee Chat vs. Informational Interview', desc:'Coffee chat: in-person, informal, same city. Informational interview: video or phone, someone not local, slightly more structured. Same underlying request, different format — naming the right one signals real familiarity.' },
+  { num:'03', name:'Come With Real Questions', desc:'2-3 specific questions about their actual path or a decision they navigated — not "any advice for someone like me," which puts the entire burden of the conversation back on them.' },
+  { num:'04', name:'The 24-Hour Follow-Up', desc:'A short thank-you referencing one specific thing from the conversation, sent within a day. This is what turns a single call into an ongoing relationship instead of a one-time favor.' },
+  { num:'05', name:'Ask Who Else to Talk To', desc:'End every good conversation by asking if there\'s anyone else they\'d recommend. A well-run 15-minute call routinely turns into two or three more introductions — that\'s how a network actually compounds.' },
+];
 
 function renderInterview(){
   const cats = ['All', ...new Set(QBANK.map(q=>q.cat))];
@@ -7029,27 +6751,6 @@ function renderInterview(){
     </div>
     <div class="qbank-list" id="qbankList"></div>
 
-    <div class="dt-section-title">Mock Interview Bot</div>
-    <div class="bot-panel">
-      <div class="bot-header">
-        <div class="bot-avatar">IQ</div>
-        <div>
-          <h3>Mock Interviewer &amp; Answer Coach</h3>
-          <p>PRACTICE MODE · AI-GENERATED FEEDBACK</p>
-        </div>
-      </div>
-      <div class="bot-messages" id="mockMessages"></div>
-      <div class="bot-suggestions" id="mockSuggestions">
-        <button class="bot-chip" data-q="Give me a technical investment banking question and wait for my answer before critiquing it">Ask me a technical question</button>
-        <button class="bot-chip" data-q="Give me a behavioral interview question and wait for my answer before critiquing it">Ask me a behavioral question</button>
-        <button class="bot-chip" data-q="What's the ideal structure for answering 'why this firm, why this role'?">How should I structure fit answers?</button>
-      </div>
-      <div class="bot-input-row">
-        <input type="text" id="mockInput" placeholder="Ask for a question, or paste your answer for feedback...">
-        <button class="bot-send" id="mockSendBtn">Send</button>
-      </div>
-    </div>
-
     <div class="dt-section-title">Resume &amp; LinkedIn</div>
     <div class="strategy-grid">
       ${RESUME_TIPS.map(t=>`
@@ -7058,25 +6759,6 @@ function renderInterview(){
           <h3>${t.name}</h3>
           <p>${t.desc}</p>
         </div>`).join('')}
-    </div>
-    <div class="bot-panel">
-      <div class="bot-header">
-        <div class="bot-avatar">IQ</div>
-        <div>
-          <h3>Resume &amp; LinkedIn Coach</h3>
-          <p>PASTE YOUR TEXT · TELL IT YOUR TARGET ROLE · AI-GENERATED</p>
-        </div>
-      </div>
-      <div class="bot-messages" id="resumeMessages"></div>
-      <div class="bot-suggestions" id="resumeSuggestions">
-        <button class="bot-chip" data-q="Rewrite this bullet for an investment banking resume: 'Responsible for financial modeling and reporting for the finance team.'">Rewrite a weak bullet</button>
-        <button class="bot-chip" data-q="Write me a strong LinkedIn headline for someone targeting wealth management roles, coming from a customer service background.">Help with my LinkedIn headline</button>
-        <button class="bot-chip" data-q="What should change on my resume if I'm applying to trading roles versus accounting roles?">Trading vs. accounting resume differences</button>
-      </div>
-      <div class="bot-input-row">
-        <input type="text" id="resumeInput" placeholder="Paste a bullet or ask a question...">
-        <button class="bot-send" id="resumeSendBtn">Send</button>
-      </div>
     </div>
 
     <div class="dt-section-title">Networking &amp; Coffee Chats</div>
@@ -7088,72 +6770,11 @@ function renderInterview(){
           <p>${t.desc}</p>
         </div>`).join('')}
     </div>
-    <div class="bot-panel">
-      <div class="bot-header">
-        <div class="bot-avatar">IQ</div>
-        <div>
-          <h3>Networking Prep Coach</h3>
-          <p>DRAFT OUTREACH · PREP COFFEE CHAT QUESTIONS · AI-GENERATED</p>
-        </div>
-      </div>
-      <div class="bot-messages" id="networkingMessages"></div>
-      <div class="bot-suggestions" id="networkingSuggestions">
-        <button class="bot-chip" data-q="Critique this cold outreach message and suggest a rewrite: 'Hi, I saw you work in finance and would love to connect and learn more about your firm.'">Critique my cold outreach message</button>
-        <button class="bot-chip" data-q="Help me prepare 3 specific questions for a coffee chat with an investment banking analyst at a bulge bracket bank.">Prep questions for a coffee chat</button>
-        <button class="bot-chip" data-q="Write a follow-up thank-you message after a 20-minute coffee chat where the person shared how they transitioned from audit into investment banking.">Help me write a follow-up</button>
-      </div>
-      <div class="bot-input-row">
-        <input type="text" id="networkingInput" placeholder="Paste a message or ask a question...">
-        <button class="bot-send" id="networkingSendBtn">Send</button>
-      </div>
-    </div>
   `;
   renderQBank();
-  renderMockMessages();
-  renderResumeMessages();
-  renderNetworkingMessages();
 
   document.querySelectorAll('#filterRow .filter-chip').forEach(chip=>{
     chip.addEventListener('click', ()=>{ interviewFilter = chip.dataset.cat; renderInterview(); });
-  });
-  document.querySelectorAll('#mockSuggestions .bot-chip').forEach(chip=>{
-    chip.addEventListener('click', ()=> sendMockMessage(chip.dataset.q));
-  });
-  document.querySelectorAll('#resumeSuggestions .bot-chip').forEach(chip=>{
-    chip.addEventListener('click', ()=> sendResumeMessage(chip.dataset.q));
-  });
-  document.querySelectorAll('#networkingSuggestions .bot-chip').forEach(chip=>{
-    chip.addEventListener('click', ()=> sendNetworkingMessage(chip.dataset.q));
-  });
-  $('#resumeSendBtn').addEventListener('click', ()=>{
-    const val = $('#resumeInput').value.trim();
-    if(val) sendResumeMessage(val);
-  });
-  $('#resumeInput').addEventListener('keydown', (e)=>{
-    if(e.key === 'Enter'){
-      const val = $('#resumeInput').value.trim();
-      if(val) sendResumeMessage(val);
-    }
-  });
-  $('#networkingSendBtn').addEventListener('click', ()=>{
-    const val = $('#networkingInput').value.trim();
-    if(val) sendNetworkingMessage(val);
-  });
-  $('#networkingInput').addEventListener('keydown', (e)=>{
-    if(e.key === 'Enter'){
-      const val = $('#networkingInput').value.trim();
-      if(val) sendNetworkingMessage(val);
-    }
-  });
-  $('#mockSendBtn').addEventListener('click', ()=>{
-    const val = $('#mockInput').value.trim();
-    if(val) sendMockMessage(val);
-  });
-  $('#mockInput').addEventListener('keydown', (e)=>{
-    if(e.key === 'Enter'){
-      const val = $('#mockInput').value.trim();
-      if(val) sendMockMessage(val);
-    }
   });
 }
 
@@ -7169,319 +6790,6 @@ function renderQBank(){
   list.querySelectorAll('.qbank-item').forEach(item=>{
     item.querySelector('.qbank-q').addEventListener('click', ()=> item.classList.toggle('open'));
   });
-}
-
-function renderMockMessages(){
-  const box = $('#mockMessages');
-  if(!box) return;
-  box.innerHTML = mockBotMessages.map(m => `<div class="bmsg ${m.role === 'bot' ? 'bot' : 'user'}">${m.text}</div>`).join('')
-    + (mockBotBusy ? `<div class="bmsg bot typing">Thinking…</div>` : '');
-  box.scrollTop = box.scrollHeight;
-}
-
-const MOCK_SYSTEM_PROMPT = `You are the FinanceIQ Mock Interviewer and Answer Coach, an educational feature inside a finance-learning app for people preparing for finance/accounting job interviews.
-
-Behavior:
-- If asked for a technical or behavioral question, give ONE question and then stop and wait for the user's answer — do not immediately answer it yourself.
-- When the user provides an answer (to a question you asked, or one they bring from elsewhere), critique it specifically: for behavioral questions, check STAR structure (Situation, Task, Action, Result) and whether the Action is concrete; for technical questions, check factual accuracy and whether the explanation is structured and appropriately concise (interviewers generally expect ~60-90 second structured answers, not rambling).
-- Be encouraging but honest — point out specifically what's missing or wrong, not just generic praise.
-- Keep responses focused: a few short paragraphs or a tight list, not an essay.
-- You're a practice tool; you can note that briefly if relevant, without repeating it constantly.`;
-
-async function sendMockMessage(text){
-  if(mockBotBusy) return;
-  mockBotMessages.push({ role:'user', text: escapeHtml(text) });
-  $('#mockInput').value = '';
-  mockBotBusy = true;
-  renderMockMessages();
-
-  try{
-    const apiMessages = mockBotMessages.map(m => ({ role: m.role === 'bot' ? 'assistant' : 'user', content: m.text }));
-    const response = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
-        system: MOCK_SYSTEM_PROMPT,
-        messages: apiMessages
-      })
-    });
-    const data = await response.json();
-    const textBlocks = (data.content || []).filter(c => c.type === 'text').map(c => c.text);
-    const reply = textBlocks.join('\n\n') || "I wasn't able to generate a response that time — try again.";
-    mockBotMessages.push({ role:'bot', text: escapeHtml(reply).replace(/\n/g,'<br>') });
-  }catch(e){
-    mockBotMessages.push({ role:'bot', text: "I couldn't reach the mock interviewer just now. Try again in a moment." });
-  }finally{
-    mockBotBusy = false;
-    renderMockMessages();
-  }
-}
-
-// ---------- IS FINANCE FOR YOU? (CAREER FIT QUIZ) ----------
-const FIT_QUESTIONS = [
-  { q:'What sounds most satisfying to work on all day?', opts:[
-    {t:'Building financial models and negotiating how a deal gets structured', k:'ib'},
-    {t:'Watching markets move and reacting quickly to new information', k:'trading'},
-    {t:'Digging into a company\'s filings until the numbers tell a clear story', k:'acct'},
-    {t:'Sitting with a person and mapping out their financial life for the next 20 years', k:'wealth'} ]},
-  { q:'How do you feel about risk?', opts:[
-    {t:'I like calculated risk with a clear payoff at the end of a long process', k:'ib'},
-    {t:'I want fast feedback — I\'ll know within minutes if I was right', k:'trading'},
-    {t:'I\'d rather minimize risk and get things exactly correct', k:'acct'},
-    {t:'I think about risk in terms of someone else\'s goals, not my own P&L', k:'wealth'} ]},
-  { q:'Pick a work rhythm.', opts:[
-    {t:'Long, intense sprints around deal timelines', k:'ib'},
-    {t:'Fast-paced, all day, tied to market hours', k:'trading'},
-    {t:'Steady and detail-oriented, with hard deadlines (quarter/year-end)', k:'acct'},
-    {t:'Relationship-paced — meetings, planning, check-ins', k:'wealth'} ]},
-  { q:'What would feel most satisfying to actually achieve?', opts:[
-    {t:'Closing a deal', k:'ib'},
-    {t:'Being right on a trade thesis', k:'trading'},
-    {t:'Catching an error before anyone else does', k:'acct'},
-    {t:'A client feeling confident about their future', k:'wealth'} ]},
-  { q:'What\'s your ideal relationship to other people at work?', opts:[
-    {t:'A small, intense team pushing toward one outcome', k:'ib'},
-    {t:'Mostly independent, even sitting on a desk with others', k:'trading'},
-    {t:'Working with data most of the day, presenting findings occasionally', k:'acct'},
-    {t:'Building long-term, one-on-one relationships', k:'wealth'} ]},
-  { q:'Which of these would bother you most?', opts:[
-    {t:'Being stuck on a deal that drags for months with no outcome', k:'ib'},
-    {t:'Taking a large, painful loss on a position', k:'trading'},
-    {t:'Making an error that goes unnoticed until an audit', k:'acct'},
-    {t:'Giving a client advice that turns out to be wrong', k:'wealth'} ]},
-];
-const FIT_RESULTS = {
-  ib:    { title:'Investment Banking & Corporate Finance', trackId:'t3', trackId2:'t7',
-    desc:'You\'re drawn to structured, high-stakes work with a clear finish line — a closed deal, a completed model. That points toward Investment Banking & Corporate Finance. Start with Track 03 (Valuation & Modeling) and Track 07 (Careers in Finance) to build both the technical skill and the interview readiness this path demands.' },
-  trading: { title:'Trading & Markets', trackId:'t4', trackId2:'t5',
-    desc:'You like fast feedback and independent decision-making under pressure. That points toward Trading & Markets. Start with Track 04 (Stock Market & Investing) and Track 05 (Trading & Technical Analysis) — which includes a full day trading module with an AI strategy assistant.' },
-  acct: { title:'Accounting & Financial Analysis', trackId:'t1', trackId2:'t2',
-    desc:'You like precision, depth, and being the person who catches what others miss. That points toward Accounting & Financial Statement Analysis. Start with Track 01 (Accounting Foundations) and Track 02 (Financial Statement Analysis).' },
-  wealth: { title:'Wealth Management & Advisory', trackId:'t6', trackId2:'t7',
-    desc:'You\'re motivated by long-term relationships and helping someone else reach their goals, not just being right on a number. That points toward Wealth Management. Start with Track 06 (Wealth & Personal Finance) — client conversation skills from Track 07 will help too.' },
-};
-
-// Brief career profiles — pay figures are rough U.S. entry-level ranges and vary a lot by
-// city, firm, and market conditions; not a guarantee of any specific offer.
-const CAREER_PROFILES = [
-  { name:'Investment Banking Analyst', pay:'~$100K–150K base + bonus (entry)', hours:'60–90+ hrs/wk, unpredictable',
-    desc:'Junior support on M&A and capital-raising deals — building financial models, formatting pitch decks, and running due diligence under senior bankers. Highest pay on this list, but also the least predictable schedule.' },
-  { name:'Sales & Trading Analyst', pay:'~$90K–130K base + bonus (entry)', hours:'~50–55 hrs/wk, tied to market hours',
-    desc:'Executes trades, monitors positions and risk, and works with institutional clients on a trading desk. More predictable hours than IB since the day is bounded by market open/close.' },
-  { name:'Staff Accountant / Financial Analyst', pay:'~$55K–75K (entry)', hours:'~40–50 hrs/wk (heavier during close/audit season)',
-    desc:'Prepares and analyzes financial records for accuracy and compliance — reconciliations, journal entries, financial statement prep. Steadier hours than IB or trading, with predictable crunch periods.' },
-  { name:'Wealth Management Associate / Advisor', pay:'~$50K–70K base (entry); senior advisors often earn more via AUM fees', hours:'~40–50 hrs/wk, client-meeting driven',
-    desc:'Builds financial plans, reviews client portfolios, and works to grow a book of clients. Pay scales heavily with experience and client relationships built over years, unlike most paths on this list.' },
-  { name:'FP&A Analyst', pay:'~$65K–85K (entry)', hours:'~40–50 hrs/wk (heavier during budget/forecast cycles)',
-    desc:'The internal finance partner for other departments — builds forecasts, explains variances, and reports the KPIs leadership actually uses to make decisions.' },
-  { name:'Real Estate Finance Analyst', pay:'~$70K–95K (entry, varies widely by firm type)', hours:'~50–70 hrs/wk at deal-heavy firms',
-    desc:'Underwrites property acquisitions, builds real estate financial models, and supports due diligence on deals — similar rigor to IB, applied to physical assets instead of companies.' },
-];
-
-let fitAnswers = [];
-let fitStep = 0;
-
-function careerQuizFragment(){
-  if(fitStep >= FIT_QUESTIONS.length){
-    return careerQuizResultFragment();
-  }
-  const question = FIT_QUESTIONS[fitStep];
-  const pct = Math.round((fitStep / FIT_QUESTIONS.length) * 100);
-  return `
-    <div class="fit-progress-track"><div class="fit-progress-fill" style="width:${pct}%"></div></div>
-    <div class="fit-card">
-      <div class="fk">QUESTION ${fitStep+1} OF ${FIT_QUESTIONS.length}</div>
-      <h2>${question.q}</h2>
-      ${question.opts.map((o,i)=>`<button class="fit-opt" data-k="${o.k}">${o.t}</button>`).join('')}
-    </div>
-  `;
-}
-
-function careerQuizResultFragment(){
-  const scores = { ib:0, trading:0, acct:0, wealth:0 };
-  fitAnswers.forEach(k => scores[k]++);
-  const winner = Object.keys(scores).reduce((a,b) => scores[a] >= scores[b] ? a : b);
-  const result = FIT_RESULTS[winner];
-  const maxScore = FIT_QUESTIONS.length;
-  return `
-    <div class="fit-result">
-      <div class="fk">YOUR STARTING POINT</div>
-      <h2>${result.title}</h2>
-      <p>${result.desc}</p>
-      <p style="font-size:12.5px; color:var(--bone-50); font-family:var(--mono); line-height:1.7;">This is a lightweight self-assessment, not a career test — treat it as a starting track to try, not a verdict on who you are. Plenty of people end up strongest in a track that wasn't their first guess.</p>
-      <div class="fit-result-actions">
-        <button class="fit-btn-primary" id="goToTrackBtn">Start ${result.title.split(' ')[0] === 'Investment' ? 'Track 03' : result.title.split(' &')[0]} track</button>
-        <button class="fit-btn-ghost" id="retakeFitBtn">Retake quiz</button>
-      </div>
-      <div class="fit-scores">
-        ${Object.keys(scores).map(k => `
-          <div class="fit-score-row">
-            <span style="width:150px;">${FIT_RESULTS[k].title.split(' ')[0]}${FIT_RESULTS[k].title.split(' ')[1]?.startsWith('&')?'':''}</span>
-            <div class="fit-score-bar"><div class="fit-score-fill" style="width:${(scores[k]/maxScore)*100}%"></div></div>
-            <span>${scores[k]}/${maxScore}</span>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-
-    <div class="dt-section-title">All career paths</div>
-    <p class="curriculum-hours" style="margin-bottom:20px;">Rough U.S. entry-level ranges — actual pay varies a lot by city, firm, and market conditions.</p>
-    <div class="strategy-grid">
-      ${CAREER_PROFILES.map(c=>`
-        <div class="strategy-card">
-          <h3>${c.name}</h3>
-          <p>${c.desc}</p>
-          <div class="srow"><span>Typical pay</span><b>${c.pay}</b></div>
-          <div class="srow"><span>Hours</span><b>${c.hours}</b></div>
-        </div>
-      `).join('')}
-    </div>
-  `;
-}
-
-function wireCareerQuizEvents(){
-  document.querySelectorAll('.fit-opt').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      fitAnswers.push(btn.dataset.k);
-      fitStep++;
-      renderTrack();
-    });
-  });
-  if($('#goToTrackBtn')){
-    $('#goToTrackBtn').addEventListener('click', ()=>{
-      const scores = { ib:0, trading:0, acct:0, wealth:0 };
-      fitAnswers.forEach(k => scores[k]++);
-      const winner = Object.keys(scores).reduce((a,b) => scores[a] >= scores[b] ? a : b);
-      view = { screen:'track', trackId: FIT_RESULTS[winner].trackId };
-      render();
-    });
-  }
-  if($('#retakeFitBtn')){
-    $('#retakeFitBtn').addEventListener('click', ()=>{
-      fitAnswers = []; fitStep = 0; renderTrack();
-    });
-  }
-}
-
-// ---------- RESUME & LINKEDIN LAB ----------
-const RESUME_TIPS = [
-  { num:'01', name:'Format & Structure', desc:'One page. Reverse-chronological. Consistent bullet formatting. No photo, no objective statement — lead straight into experience.' },
-  { num:'02', name:'Quantify Every Bullet', desc:'"Built a 3-statement model used in a $12M budget decision" beats "Responsible for financial modeling." A number or a concrete outcome makes a claim checkable.' },
-  { num:'03', name:'LinkedIn Headline & Summary', desc:'Headline should say what you do and for whom, not just a job title. Summary should read like the "walk me through your resume" answer — one clear through-line.' },
-  { num:'04', name:'Tailor Per Role', desc:'IB resumes lead with modeling/deal reps. Wealth management resumes lead with client-facing and relationship metrics. Same person, different lead bullets, depending on the target.' },
-  { num:'05', name:'Common Mistakes', desc:'Responsibilities instead of outcomes, generic objective statements, inconsistent tense, and a LinkedIn photo that doesn\'t match the resume\'s professionalism.' },
-];
-const NETWORKING_TIPS = [
-  { num:'01', name:'The Small Ask', desc:'Never ask a stranger for a job in the first message. Ask for 15-20 minutes of their perspective — a request almost anyone reasonable can say yes to without much thought.' },
-  { num:'02', name:'Coffee Chat vs. Informational Interview', desc:'Coffee chat: in-person, informal, same city. Informational interview: video or phone, someone not local, slightly more structured. Same underlying request, different format — naming the right one signals real familiarity.' },
-  { num:'03', name:'Come With Real Questions', desc:'2-3 specific questions about their actual path or a decision they navigated — not "any advice for someone like me," which puts the entire burden of the conversation back on them.' },
-  { num:'04', name:'The 24-Hour Follow-Up', desc:'A short thank-you referencing one specific thing from the conversation, sent within a day. This is what turns a single call into an ongoing relationship instead of a one-time favor.' },
-  { num:'05', name:'Ask Who Else to Talk To', desc:'End every good conversation by asking if there\'s anyone else they\'d recommend. A well-run 15-minute call routinely turns into two or three more introductions — that\'s how a network actually compounds.' },
-];
-let resumeBotMessages = [
-  { role:'bot', text:`Paste a resume bullet, your LinkedIn summary, or a full resume section, and tell me what role you're targeting (IB, trading, accounting, wealth management, etc). I'll give specific feedback and a tailored rewrite — not generic advice.` }
-];
-let resumeBotBusy = false;
-let networkingBotMessages = [
-  { role:'bot', text:`Tell me about a specific networking situation — drafting a cold outreach message, prepping questions for a coffee chat, writing a follow-up, or figuring out how to ask for a referral — and I'll help you work through it with something specific to your situation, not generic advice.` }
-];
-let networkingBotBusy = false;
-
-function renderResumeMessages(){
-  const box = $('#resumeMessages');
-  if(!box) return;
-  box.innerHTML = resumeBotMessages.map(m => `<div class="bmsg ${m.role === 'bot' ? 'bot' : 'user'}">${m.text}</div>`).join('')
-    + (resumeBotBusy ? `<div class="bmsg bot typing">Thinking…</div>` : '');
-  box.scrollTop = box.scrollHeight;
-}
-function renderNetworkingMessages(){
-  const box = $('#networkingMessages');
-  if(!box) return;
-  box.innerHTML = networkingBotMessages.map(m => `<div class="bmsg ${m.role === 'bot' ? 'bot' : 'user'}">${m.text}</div>`).join('')
-    + (networkingBotBusy ? `<div class="bmsg bot typing">Thinking…</div>` : '');
-  box.scrollTop = box.scrollHeight;
-}
-
-const RESUME_SYSTEM_PROMPT = `You are the FinanceIQ Resume & LinkedIn Coach, an educational feature inside a finance-learning app.
-
-Rules:
-- When given a resume bullet, summary, or LinkedIn text, give specific, actionable feedback (what's weak, what's missing — usually quantification or a clear outcome) and then provide a rewritten version.
-- If the user names a target role (IB, trading, accounting, wealth management, etc.), tailor the rewrite and advice to what that role's resumes typically emphasize.
-- If no target role is given, ask which role they're targeting before writing a full rewrite — a generic resume tip can be given either way, but a tailored rewrite needs the target.
-- Be direct and specific rather than generically encouraging — the goal is a resume that gets interviews, not just positive feedback.
-- Keep responses concise and practical.`;
-
-const NETWORKING_SYSTEM_PROMPT = `You are the FinanceIQ Networking Prep Coach, an educational feature inside a finance-learning app helping people network effectively to land finance roles — cold outreach, coffee chats, informational interviews, and follow-up.
-
-Rules:
-- If asked to critique or draft a cold outreach message, check for the core criteria this app teaches: short, specific to the recipient's actual work (not generic flattery), asks for exactly one small thing (commonly 15-20 minutes, never a job directly), and low-pressure (no hidden agenda). Give a specific rewrite, not just generic praise.
-- If asked to help prepare questions for a coffee chat or informational interview, generate 2-3 genuinely specific questions tied to whatever context the user gives about the person or firm — never generic questions like "any advice for someone like me."
-- If asked about follow-up messages, emphasize referencing one specific thing from the actual conversation, sent within 24 hours, and ending with a light, non-pressuring touchpoint rather than a direct ask.
-- If asked about asking for a referral, be direct about timing (only after a real relationship exists, not in a first message) and phrasing (asking if they'd be comfortable referring you, not assuming they will).
-- Distinguish coffee chats (in-person, informal, same city) from informational interviews (video/phone, more structured) when relevant.
-- Be specific and practical, not generically encouraging — the goal is messages and conversations that actually get responses and lead somewhere, not just polite-sounding advice.
-- Keep responses concise: a few short paragraphs or a tight list, not an essay.`;
-
-async function sendResumeMessage(text){
-  if(resumeBotBusy) return;
-  resumeBotMessages.push({ role:'user', text: escapeHtml(text) });
-  $('#resumeInput').value = '';
-  resumeBotBusy = true;
-  renderResumeMessages();
-  try{
-    const apiMessages = resumeBotMessages.map(m => ({ role: m.role === 'bot' ? 'assistant' : 'user', content: m.text }));
-    const response = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
-        system: RESUME_SYSTEM_PROMPT,
-        messages: apiMessages
-      })
-    });
-    const data = await response.json();
-    const textBlocks = (data.content || []).filter(c => c.type === 'text').map(c => c.text);
-    const reply = textBlocks.join('\n\n') || "I wasn't able to generate a response that time — try again.";
-    resumeBotMessages.push({ role:'bot', text: escapeHtml(reply).replace(/\n/g,'<br>') });
-  }catch(e){
-    resumeBotMessages.push({ role:'bot', text: "I couldn't reach the coach just now. Try again in a moment." });
-  }finally{
-    resumeBotBusy = false;
-    renderResumeMessages();
-  }
-}
-
-async function sendNetworkingMessage(text){
-  if(networkingBotBusy) return;
-  networkingBotMessages.push({ role:'user', text: escapeHtml(text) });
-  $('#networkingInput').value = '';
-  networkingBotBusy = true;
-  renderNetworkingMessages();
-  try{
-    const apiMessages = networkingBotMessages.map(m => ({ role: m.role === 'bot' ? 'assistant' : 'user', content: m.text }));
-    const response = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
-        system: NETWORKING_SYSTEM_PROMPT,
-        messages: apiMessages
-      })
-    });
-    const data = await response.json();
-    const textBlocks = (data.content || []).filter(c => c.type === 'text').map(c => c.text);
-    const reply = textBlocks.join('\n\n') || "I wasn't able to generate a response that time — try again.";
-    networkingBotMessages.push({ role:'bot', text: escapeHtml(reply).replace(/\n/g,'<br>') });
-  }catch(e){
-    networkingBotMessages.push({ role:'bot', text: "I couldn't reach the coach just now. Try again in a moment." });
-  }finally{
-    networkingBotBusy = false;
-    renderNetworkingMessages();
-  }
 }
 
 // ---------- INVESTMENT BANKING LAB ----------
