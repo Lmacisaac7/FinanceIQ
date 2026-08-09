@@ -6272,11 +6272,6 @@ function renderTrack(){
       `).join('')}
     </div>
     ` : ''}
-    ${track.id === 't7' ? `
-    <div class="dt-section-title" style="margin-top:34px;">Careers in Finance quiz</div>
-    <p class="curriculum-hours" style="margin-bottom:20px;">A quick, honest self-assessment — six questions, no wrong answers, just a starting point.</p>
-    ${careerQuizFragment()}
-    ` : ''}
   `;
   $('#backToDash').addEventListener('click', ()=>{ view={screen:'dashboard'}; render(); });
   document.querySelectorAll('.glossary-link').forEach(link=>{
@@ -6373,9 +6368,6 @@ function renderTrack(){
       renderTrack();
     });
   });
-  if(track.id === 't7'){
-    wireCareerQuizEvents();
-  }
   if(track.id === 't3' && $('#downloadModelBtn')){
     $('#downloadModelBtn').addEventListener('click', ()=>{
       downloadXlsxFromB64(MODEL_EXERCISE_XLSX_B64, 'Anchor-Robotics-Model-Exercise.xlsx');
