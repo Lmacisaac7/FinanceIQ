@@ -6073,6 +6073,7 @@ function renderDashboard(){
 }
 
 function renderTrack(){
+  window.scrollTo(0, 0);
   const track = findTrack(view.trackId);
   const p = trackProgress(track);
   const accent = getTrackAccent(track.id);
@@ -6597,6 +6598,7 @@ function buildLessonTOC(bodyHtml){
 }
 
 function renderLesson(){
+  window.scrollTo(0, 0);
   const track = findTrack(view.trackId);
   const idx = track.lessons.findIndex(l=>l.id===view.lessonId);
   const lesson = track.lessons[idx];
